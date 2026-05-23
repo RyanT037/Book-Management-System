@@ -14,9 +14,15 @@ model User {
   name      String
   username  String   @unique
   password  String
+  role      Role     @default(USER)
   createdAt DateTime @default(now())
 
   books Book[]
+}
+
+enum Role {
+  USER
+  ADMIN
 }
 
 model Book {
