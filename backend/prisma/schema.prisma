@@ -32,8 +32,10 @@ model Book {
   isbn          String   @unique
   publishedYear Int
   description   String
-  available     Boolean  @default(true)
+  quantity      Int
+  available     Boolean? @default(false)
   createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   userId Int
   user   User @relation(fields: [userId], references: [id])

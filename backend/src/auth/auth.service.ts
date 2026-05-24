@@ -3,81 +3,55 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-
+import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
-
-import * as bcrypt from 'bcrypt';
-import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
   constructor(
     private prisma: PrismaService,
-    private jwtService: JwtService,
-  ) { }
+    private jwt: JwtService,
+  ) {}
 
   async register(dto: RegisterDto) {
-    const existingUser = await this.prisma.user.findUnique({
-      where: {
-        email: dto.email,
-      },
+    const exists = await this.prisma.user.findUnique({
+      where: { email: dto.email },
     });
-
-    if (existingUser) {
+    if (exists) {
       throw new BadRequestException('Email already exists');
     }
-
-    const hashedPassword = await bcrypt.hash(dto.password, 10);
 
     const user = await this.prisma.user.create({
       data: {
         email: dto.email,
-        password: hashedPassword,
+        password: await bcrypt.hash(dto.password, 10),
         name: dto.name,
         username: dto.username,
       },
     });
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password: _password, ...safeUser } = user;
-
+    const { password: _, ...safeUser } = user;
     return {
-      message: 'User registered successfully',
       user: safeUser,
+      access_token: await this.signToken(user.id, user.email),
     };
   }
 
   async login(dto: LoginDto) {
     const user = await this.prisma.user.findUnique({
-      where: {
-        email: dto.email,
-      },
+      where: { email: dto.email },
     });
-
-    if (!user) {
+    if (!user || !(await bcrypt.compare(dto.password, user.password))) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const passwordMatches = await bcrypt.compare(
-      dto.password,
-      user.password,
-    );
+    return { access_token: await this.signToken(user.id, user.email) };
+  }
 
-    if (!passwordMatches) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
-
-    const payload = {
-      sub: user.id,
-      email: user.email,
-    };
-
-    const token = await this.jwtService.signAsync(payload);
-
-    return {
-      access_token: token,
-    };
+  private signToken(userId: number, email: string) {
+    return this.jwt.signAsync({ sub: userId, email });
   }
 }

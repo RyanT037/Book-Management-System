@@ -12,7 +12,6 @@ import { AuthGuard } from '@nestjs/passport';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { GetUser } from '../auth/decorators/get-user.decorator';
 
 @UseGuards(AuthGuard('jwt'))
 @Controller('users')
@@ -25,8 +24,7 @@ export class UsersController {
   }
 
   @Get()
-  findAll(@GetUser() user: { id: number; email: string }) {
-    console.log('Requested by:', user.email);
+  findAll() {
     return this.usersService.findAll();
   }
 
@@ -45,4 +43,3 @@ export class UsersController {
     return this.usersService.remove(+id);
   }
 }
-
