@@ -3,12 +3,11 @@ import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 import { PrismaService } from '../prisma/prisma.service';
 
-const PAGE_SIZE = 10;
-
 @Injectable()
 export class BooksService {
   constructor(private prisma: PrismaService) {}
 
+  // 1. Create a new book mapping exactly to the DTO and your exam requirements
   create(dto: CreateBookDto, userId: number) {
     return this.prisma.book.create({
       data: {
@@ -17,67 +16,46 @@ export class BooksService {
         isbn: dto.isbn,
         publishedYear: dto.publishedYear,
         description: dto.description,
-        quantity: dto.quantity,
-        available: dto.quantity > 0,
-        userId,
+        userId, // Keeps books isolated to authenticated users
       },
     });
   }
 
-  findAll(userId: number, page = 1) {
+  // 2. Simplified: Retrieve all books belonging to the user without pagination complexity
+  findAll(userId: number) {
     return this.prisma.book.findMany({
       where: { userId },
-      skip: (page - 1) * PAGE_SIZE,
-      take: PAGE_SIZE,
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: 'desc' }, // Keeps newest books at the top
     });
   }
 
-  findAvailable(page = 1) {
-    return this.prisma.book.findMany({
-      where: { available: true },
-      skip: (page - 1) * PAGE_SIZE,
-      take: PAGE_SIZE,
-      orderBy: { createdAt: 'desc' },
-    });
-  }
-
+  // 3. Retrieve a single book safely
   async findOne(id: number, userId: number) {
     const book = await this.prisma.book.findFirst({
       where: { id, userId },
     });
+    
     if (!book) {
       throw new NotFoundException(`Book with id ${id} not found`);
     }
     return book;
   }
 
+  // 4. Update a book directly using fields passed in the DTO
   async update(id: number, dto: UpdateBookDto, userId: number) {
-    const existing = await this.prisma.book.findFirst({
-      where: { id, userId },
-    });
-    if (!existing) {
-      throw new NotFoundException(`Book with id ${id} not found`);
-    }
+    // Reuses the findOne method logic to verify ownership/existence first
+    await this.findOne(id, userId);
 
     return this.prisma.book.update({
       where: { id },
-      data: {
-        ...dto,
-        ...(dto.quantity !== undefined && {
-          available: dto.quantity > 0,
-        }),
-      },
+      data: dto,
     });
   }
 
+  // 5. Delete a book
   async remove(id: number, userId: number) {
-    const existing = await this.prisma.book.findFirst({
-      where: { id, userId },
-    });
-    if (!existing) {
-      throw new NotFoundException(`Book with id ${id} not found`);
-    }
+    // Reuses the findOne method logic to verify ownership/existence first
+    await this.findOne(id, userId);
 
     await this.prisma.book.delete({ where: { id } });
     return { message: `Book ${id} deleted successfully` };

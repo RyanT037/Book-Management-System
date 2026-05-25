@@ -7,7 +7,6 @@ import {
   Delete,
   Put,
   ParseIntPipe,
-  Query,
   UseGuards,
   Req,
 } from '@nestjs/common';
@@ -17,6 +16,7 @@ import { BooksService } from './books.service';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 
+// Defines the shape of the request containing the user payload from the JWT guard
 type AuthRequest = Request & { user: { id: number; email: string } };
 
 @Controller('books')
@@ -31,18 +31,9 @@ export class BooksController {
 
   @UseGuards(AuthGuard('jwt'))
   @Get()
-  findAll(@Req() req: AuthRequest, @Query('page') page?: string) {
-    return this.booksService.findAll(
-      req.user.id,
-      page ? parseInt(page, 10) : 1,
-    );
-  }
-
-  @Get('available')
-  findAvailable(@Query('page') page?: string) {
-    return this.booksService.findAvailable(
-      page ? parseInt(page, 10) : 1,
-    );
+  findAll(@Req() req: AuthRequest) {
+    // Simplified: No pagination query parsing needed anymore
+    return this.booksService.findAll(req.user.id);
   }
 
   @UseGuards(AuthGuard('jwt'))

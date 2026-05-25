@@ -19,7 +19,4 @@ export class CreateBookDto {
   @IsString()
   description!: string;
 
-  @IsInt()
-  @Min(0)
-  quantity!: number;
 }
