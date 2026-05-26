@@ -1,15 +1,41 @@
+import { useEffect, useState } from 'react';
 import { CheckCircle2, Library } from 'lucide-react';
-import { aboutStats } from '../../data/landing.data';
+import { statsService } from '../../services/stats.service';
 import { Section } from '../ui/Section';
 
 const benefits = [
   'Centralized catalog and inventory management',
   'Role-based access for staff and administrators',
-  'Streamlined borrowing and return workflows',
+  'Manage and access library info from anywhere',
   'Actionable insights through a live dashboard',
 ];
 
 export function AboutSection() {
+  const [stats, setStats] = useState([
+    { label: 'Total Users', value: '...' },
+    { label: 'Total Books', value: '...' },
+    { label: 'Total Authors', value: '...' },
+  ]);
+
+  useEffect(() => {
+    statsService
+      .getPublicStats()
+      .then((data) => {
+        setStats([
+          { label: 'Total Users', value: data.registeredUsers.toLocaleString() },
+          { label: 'Total Books', value: data.totalBooks.toLocaleString() },
+          { label: 'Total Authors', value: data.activeAuthors.toLocaleString() },
+        ]);
+      })
+      .catch(() => {
+        setStats([
+          { label: 'Total Users', value: 'N/A' },
+          { label: 'Total Books', value: 'N/A' },
+          { label: 'Total Authors', value: 'N/A' },
+        ]);
+      });
+  }, []);
+
   return (
     <Section id="about" background="muted">
       <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
@@ -43,13 +69,13 @@ export function AboutSection() {
                 <Library className="h-10 w-10" strokeWidth={1.5} />
               </span>
               <p className="mt-6 text-sm font-medium text-slate-500">
-                Illustration placeholder — library operations hub
+                Library Management System
               </p>
             </div>
           </div>
 
           <div className="grid grid-cols-3 gap-4">
-            {aboutStats.map((stat) => (
+            {stats.map((stat) => (
               <div
                 key={stat.label}
                 className="rounded-2xl bg-white p-4 text-center shadow-card transition-transform hover:-translate-y-0.5"

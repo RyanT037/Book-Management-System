@@ -21,8 +21,8 @@ model User {
 }
 
 enum Role {
-  USER
-  ADMIN
+  USER 
+  ADMIN 
 }
 
 model Book {

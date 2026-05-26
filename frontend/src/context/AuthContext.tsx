@@ -7,7 +7,7 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import { initializeApiInterceptors } from '../services/api.client';
+import { initializeApiInterceptors } from '../services/api';
 import type { AuthContextValue, User } from '../types/auth.types';
 
 const TOKEN_KEY = 'access_token';
@@ -54,6 +54,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem(USER_KEY);
   }, []);
 
+  const updateUser = useCallback((updatedUser: User) => {
+    setUser(updatedUser);
+    localStorage.setItem(USER_KEY, JSON.stringify(updatedUser));
+  }, []);
+
   // Initialize API interceptors with logout callback
   useEffect(() => {
     initializeApiInterceptors(logout);
@@ -67,8 +72,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isLoading,
       setAuth,
       logout,
+      updateUser,
     }),
-    [user, token, isLoading, setAuth, logout],
+    [user, token, isLoading, setAuth, logout, updateUser],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

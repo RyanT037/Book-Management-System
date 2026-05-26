@@ -11,12 +11,6 @@ export function StatCard({ label, value, colorClass }: StatCardProps) {
     >
       <p className="text-sm font-medium text-white/90">{label}</p>
       <p className="mt-3 text-4xl font-bold tracking-tight">{value}</p>
-      <button
-        type="button"
-        className="mt-4 text-sm font-medium text-white/90 underline-offset-2 transition hover:text-white hover:underline"
-      >
-        View Details
-      </button>
     </div>
   );
 }

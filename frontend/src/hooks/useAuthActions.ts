@@ -14,28 +14,20 @@ export function useAuthActions() {
 
   const login = useCallback(
     async (credentials: LoginCredentials) => {
-      try {
-        const { access_token, user } = await authService.login(credentials);
-        setAuth(access_token, user ?? null);
-        toast.success('Logged in successfully');
-        navigate('/');
-      } catch {
-        toast.error('Invalid email or password');
-      }
+      const { access_token, user } = await authService.login(credentials);
+      setAuth(access_token, user ?? null);
+      toast.success('Logged in successfully');
+      navigate('/dashboard');
     },
     [setAuth, navigate],
   );
 
   const register = useCallback(
     async (credentials: RegisterCredentials) => {
-      try {
-        const { access_token, user } = await authService.register(credentials);
-        setAuth(access_token, user ?? null);
-        toast.success('Account created');
-        navigate('/');
-      } catch {
-        toast.error('Registration failed. Email or username may already exist.');
-      }
+      const { access_token, user } = await authService.register(credentials);
+      setAuth(access_token, user ?? null);
+      toast.success('Account created');
+      navigate('/dashboard');
     },
     [setAuth, navigate],
   );

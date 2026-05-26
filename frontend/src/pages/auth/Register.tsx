@@ -1,19 +1,20 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { AuthLayout } from '../../components/auth/AuthLayout';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
+import { useAuthActions } from '../../hooks/useAuthActions';
 import {
   registerSchema,
   type RegisterFormValues,
 } from '../../schemas/auth.schema';
 
 export default function Register() {
-  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const { register: registerAction } = useAuthActions();
 
   const {
     register,
@@ -23,13 +24,10 @@ export default function Register() {
     resolver: zodResolver(registerSchema),
   });
 
-  const onSubmit = async (_data: RegisterFormValues) => {
+  const onSubmit = async (data: RegisterFormValues) => {
     setIsLoading(true);
     try {
-      // TODO: Connect to backend API on Day 5 — useAuthActions().register()
-      await new Promise((resolve) => setTimeout(resolve, 900));
-      toast.success('Account created! (UI preview — auth connects on Day 5)');
-      navigate('/dashboard');
+      await registerAction(data);
     } catch {
       toast.error('Registration failed. Please try again.');
     } finally {
@@ -50,6 +48,15 @@ export default function Register() {
           placeholder="Jane Librarian"
           error={errors.name?.message}
           {...register('name')}
+        />
+
+        <Input
+          label="Username"
+          type="text"
+          autoComplete="username"
+          placeholder="janedoe"
+          error={errors.username?.message}
+          {...register('username')}
         />
 
         <Input

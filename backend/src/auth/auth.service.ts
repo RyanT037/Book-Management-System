@@ -8,13 +8,14 @@ import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+import { Role } from 'src/generated/prisma/browser';
 
 @Injectable()
 export class AuthService {
   constructor(
     private prisma: PrismaService,
     private jwt: JwtService,
-  ) {}
+  ) { }
 
   async register(dto: RegisterDto) {
     const exists = await this.prisma.user.findUnique({
@@ -30,14 +31,19 @@ export class AuthService {
         password: await bcrypt.hash(dto.password, 10),
         name: dto.name,
         username: dto.username,
+        role: Role.USER, // enforce normal user role on public registration
+      },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        username: true,
+        role: true,
       },
     });
 
-    const { password: _, ...safeUser } = user;
-    return {
-      user: safeUser,
-      access_token: await this.signToken(user.id, user.email),
-    };
+
+    return { user };
   }
 
   async login(dto: LoginDto) {
@@ -48,10 +54,20 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    return { access_token: await this.signToken(user.id, user.email) };
+    return {
+      access_token: await this.signToken(user.id, user.email, user.role),
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        username: user.username,
+        role: user.role,
+        createdAt: user.createdAt,
+      },
+    };
   }
 
-  private signToken(userId: number, email: string) {
-    return this.jwt.signAsync({ sub: userId, email });
+  private signToken(userId: number, email: string, role: Role) {
+    return this.jwt.signAsync({ sub: userId, email, role });
   }
 }

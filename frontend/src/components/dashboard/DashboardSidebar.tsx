@@ -13,6 +13,8 @@ import {
   Users,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+import { useAuthActions } from '../../hooks/useAuthActions';
+import { useAuth } from '../../context/AuthContext';
 import { cn } from '../../lib/cn';
 import { sidebarNavItems } from '../../data/dashboard.data';
 
@@ -34,6 +36,9 @@ interface DashboardSidebarProps {
 }
 
 export function DashboardSidebar({ className, onNavigate }: DashboardSidebarProps) {
+  const { logout } = useAuthActions();
+  const { user } = useAuth();
+
   return (
     <aside
       className={cn(
@@ -49,7 +54,9 @@ export function DashboardSidebar({ className, onNavigate }: DashboardSidebarProp
       </div>
 
       <nav className="flex-1 space-y-1 overflow-y-auto p-4">
-        {sidebarNavItems.map((item) => {
+        {sidebarNavItems
+          .filter((item) => !(item.label === 'Users' && user?.role !== 'ADMIN'))
+          .map((item) => {
           const Icon = iconMap[item.label] ?? LayoutDashboard;
           return (
             <NavLink
@@ -80,6 +87,10 @@ export function DashboardSidebar({ className, onNavigate }: DashboardSidebarProp
         <button
           type="button"
           className="flex w-full items-center gap-3 rounded-xl bg-slate-50 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+          onClick={() => {
+            logout();
+            onNavigate?.();
+          }}
         >
           <LogOut className="h-4 w-4" />
           <span>Logout</span>

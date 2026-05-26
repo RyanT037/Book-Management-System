@@ -39,13 +39,13 @@ export const features: FeatureItem[] = [
     icon: Lock,
     title: 'User Authentication',
     description:
-      'Secure sign-in flows for librarians, administrators, and members with role-ready access.',
+      'Secure sign-in flows for librarians and administrators.',
   },
   {
     icon: RefreshCw,
     title: 'Borrowing System',
     description:
-      'Track check-outs, returns, and due dates with clear visibility for staff and readers.',
+      'Coming Soon'
   },
   {
     icon: LayoutDashboard,
@@ -57,22 +57,21 @@ export const features: FeatureItem[] = [
     icon: Smartphone,
     title: 'Responsive Design',
     description:
-      'Manage operations seamlessly on desktop, tablet, and mobile without compromising UX.',
+      'Manage operations seamlessly on desktop, tablet, and mobile from anywhere.',
   },
   {
     icon: Shield,
     title: 'Secure Access',
     description:
-      'Built with modern security practices to protect accounts, data, and library operations.',
+      'Built with modern security practices to protect your personal accounts, data, and library operations.',
   },
 ];
 
-// TODO: Connect to backend API on Day 5
 export const landingStats: StatItem[] = [
-  { label: 'Total Books', value: '1,200', colorClass: 'bg-stat-blue' },
-  { label: 'Registered Users', value: '450', colorClass: 'bg-stat-indigo' },
-  { label: 'Books Borrowed', value: '320', colorClass: 'bg-stat-purple' },
-  { label: 'Satisfaction', value: '98%', colorClass: 'bg-stat-coral' },
+  { label: 'Total Books', value: '...', colorClass: 'bg-stat-blue' },
+  { label: 'Registered Users', value: '...', colorClass: 'bg-stat-indigo' },
+  { label: 'Active Authors', value: '...', colorClass: 'bg-stat-purple' },
+  { label: 'Recent Books', value: '...', colorClass: 'bg-stat-coral' },
 ];
 
 export const aboutStats = [

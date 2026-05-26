@@ -1,67 +1,130 @@
-import { type FormEvent, useState } from 'react';
+import { type FormEvent, useEffect, useState } from 'react';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { DashboardLayout } from '../../components/dashboard/DashboardLayout';
 import { Edit2, Plus, Trash2, X } from 'lucide-react';
-
-type User = {
-  id: number;
-  name: string;
-  username: string;
-  email: string;
-  role: 'USER' | 'ADMIN';
-};
-
-const sampleUsers: User[] = [
-  {
-    id: 1,
-    name: 'Ava Johnson',
-    username: 'ava_j',
-    email: 'ava.johnson@example.com',
-    role: 'ADMIN',
-  },
-  {
-    id: 2,
-    name: 'Marcus Lee',
-    username: 'marcusl',
-    email: 'marcus.lee@example.com',
-    role: 'USER',
-  },
-  {
-    id: 3,
-    name: 'Nadia Patel',
-    username: 'nadia_p',
-    email: 'nadia.patel@example.com',
-    role: 'USER',
-  },
-];
+import { userService, type User } from '../../services/users.service';
 
 export default function UsersPage() {
+  const [users, setUsers] = useState<User[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [deleteUser, setDeleteUser] = useState<User | null>(null);
+  const [formError, setFormError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let active = true;
+
+    setIsLoading(true);
+    userService
+      .list()
+      .then((data) => {
+        if (!active) return;
+        setUsers(data);
+        setError(null);
+      })
+      .catch(() => {
+        if (!active) return;
+        setError('Unable to load users. Please refresh the page and try again.');
+      })
+      .finally(() => {
+        if (!active) return;
+        setIsLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const closeModals = () => {
     setIsAddOpen(false);
     setEditingUser(null);
     setDeleteUser(null);
+    setFormError(null);
   };
 
-  const handleAddUser = (event: FormEvent<HTMLFormElement>) => {
+  const handleAddUser = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    // TODO: Connect to backend API on Day 5 and call POST /users
-    closeModals();
+    setFormError(null);
+
+    const formData = new FormData(event.currentTarget);
+    const name = formData.get('name')?.toString().trim() ?? '';
+    const username = formData.get('username')?.toString().trim() ?? '';
+    const email = formData.get('email')?.toString().trim() ?? '';
+    const role = (formData.get('role')?.toString() ?? 'USER') as User['role'];
+    const password = formData.get('password')?.toString() ?? '';
+
+    if (!name || !username || !email || !password) {
+      setFormError('Name, username, email, and password are required.');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const newUser = await userService.create({ name, username, email, role, password });
+      setUsers((current) => [...current, newUser]);
+      closeModals();
+      setError(null);
+    } catch {
+      setFormError('Unable to create user. Please verify the details and try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleEditUser = (event: FormEvent<HTMLFormElement>) => {
+  const handleEditUser = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    // TODO: Connect to backend API on Day 5 and call PATCH /users/:id
-    closeModals();
+    if (!editingUser) return;
+
+    setFormError(null);
+    const formData = new FormData(event.currentTarget);
+    const name = formData.get('name')?.toString().trim() ?? '';
+    const username = formData.get('username')?.toString().trim() ?? '';
+    const email = formData.get('email')?.toString().trim() ?? '';
+    const role = (formData.get('role')?.toString() ?? editingUser.role) as User['role'];
+    const password = formData.get('password')?.toString();
+
+    if (!name || !username || !email) {
+      setFormError('Name, username, and email are required.');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const updatedUser = await userService.update(editingUser.id, {
+        name,
+        username,
+        email,
+        role,
+        password: password?.trim() ? password : undefined,
+      });
+      setUsers((current) => current.map((user) => (user.id === updatedUser.id ? updatedUser : user)));
+      closeModals();
+      setError(null);
+    } catch {
+      setFormError('Unable to update user. Please verify the details and try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleDeleteUser = () => {
-    // TODO: Connect to backend API on Day 5 and call DELETE /users/:id
-    closeModals();
+  const handleDeleteUser = async () => {
+    if (!deleteUser) return;
+
+    setIsLoading(true);
+    try {
+      await userService.remove(deleteUser.id);
+      setUsers((current) => current.filter((user) => user.id !== deleteUser.id));
+      closeModals();
+      setError(null);
+    } catch {
+      setError('Unable to delete user. Please try again later.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -70,7 +133,7 @@ export default function UsersPage() {
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Users</h1>
           <p className="mt-1 text-sm text-slate-500">
-            Design user management UI for account and role administration. Backend wiring will be added on Day 5.
+            User management; add, edit, and delete users.
           </p>
         </div>
 
@@ -92,36 +155,55 @@ export default function UsersPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-200 bg-white">
-            {sampleUsers.map((user) => (
-              <tr key={user.id}>
-                <td className="px-5 py-4 text-sm text-slate-700">{user.name}</td>
-                <td className="px-5 py-4 text-sm text-slate-700">{user.username}</td>
-                <td className="px-5 py-4 text-sm text-slate-700">{user.email}</td>
-                <td className="px-5 py-4 text-sm text-slate-700">
-                  <span
-                    className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
-                      user.role === 'ADMIN'
-                        ? 'bg-rose-100 text-rose-700'
-                        : 'bg-slate-100 text-slate-700'
-                    }`}
-                  >
-                    {user.role}
-                  </span>
-                </td>
-                <td className="px-5 py-4 text-sm text-slate-700">
-                  <div className="flex flex-wrap gap-2">
-                    <Button variant="secondary" size="sm" onClick={() => setEditingUser(user)}>
-                      <Edit2 className="h-3.5 w-3.5" />
-                      Edit
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={() => setDeleteUser(user)}>
-                      <Trash2 className="h-3.5 w-3.5" />
-                      Delete
-                    </Button>
-                  </div>
+            {isLoading ? (
+              <tr>
+                <td colSpan={5} className="px-5 py-10 text-center text-sm text-slate-500">
+                  Loading users...
                 </td>
               </tr>
-            ))}
+            ) : error ? (
+              <tr>
+                <td colSpan={5} className="px-5 py-10 text-center text-sm text-rose-600">
+                  {error}
+                </td>
+              </tr>
+            ) : users.length === 0 ? (
+              <tr>
+                <td colSpan={5} className="px-5 py-10 text-center text-sm text-slate-500">
+                  No users found.
+                </td>
+              </tr>
+            ) : (
+              users.map((user) => (
+                <tr key={user.id}>
+                  <td className="px-5 py-4 text-sm text-slate-700">{user.name}</td>
+                  <td className="px-5 py-4 text-sm text-slate-700">{user.username}</td>
+                  <td className="px-5 py-4 text-sm text-slate-700">{user.email}</td>
+                  <td className="px-5 py-4 text-sm text-slate-700">
+                    <span
+                      className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${user.role === 'ADMIN'
+                        ? 'bg-rose-100 text-rose-700'
+                        : 'bg-slate-100 text-slate-700'
+                        }`}
+                    >
+                      {user.role}
+                    </span>
+                  </td>
+                  <td className="px-5 py-4 text-sm text-slate-700">
+                    <div className="flex flex-wrap gap-2">
+                      <Button variant="secondary" size="sm" onClick={() => setEditingUser(user)}>
+                        <Edit2 className="h-3.5 w-3.5" />
+                        Edit
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={() => setDeleteUser(user)}>
+                        <Trash2 className="h-3.5 w-3.5" />
+                        Delete
+                      </Button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
@@ -155,20 +237,20 @@ export default function UsersPage() {
                 label="Full name"
                 name="name"
                 defaultValue={editingUser?.name}
-                placeholder="Jane Doe"
+                placeholder="Richard Muti"
               />
               <Input
                 label="Username"
                 name="username"
                 defaultValue={editingUser?.username}
-                placeholder="jane_doe"
+                placeholder="Ritchie37"
               />
               <Input
                 label="Email"
                 type="email"
                 name="email"
                 defaultValue={editingUser?.email}
-                placeholder="jane.doe@example.com"
+                placeholder="ritchiemuti@example.com"
               />
               <div>
                 <label htmlFor="role" className="block text-sm font-medium text-slate-700">Role</label>
@@ -182,6 +264,23 @@ export default function UsersPage() {
                   <option value="ADMIN">ADMIN</option>
                 </select>
               </div>
+              <Input
+                label="Password"
+                name="password"
+                type="password"
+                placeholder={editingUser ? 'Leave blank to keep current password' : 'Enter a password'}
+              />
+              {formError && (
+                <div className="md:col-span-2 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+                  {formError}
+                </div>
+              )}
+              <Input
+                label="Password"
+                name="password"
+                type="password"
+                placeholder={editingUser ? 'Leave blank to keep current password' : 'Enter a password'}
+              />
               <div className="md:col-span-2 flex flex-wrap items-center justify-end gap-3 pt-2">
                 <Button variant="outline" size="lg" onClick={closeModals} type="button">
                   Cancel
@@ -200,7 +299,7 @@ export default function UsersPage() {
           <div className="w-full max-w-lg overflow-hidden rounded-3xl bg-white p-6 shadow-2xl">
             <h2 className="text-xl font-bold text-slate-900">Delete user</h2>
             <p className="mt-2 text-sm text-slate-500">
-              Permanently remove <span className="font-semibold">{deleteUser.name}</span> from the system. Backend delete logic is planned for Day 5.
+              Permanently remove <span className="font-semibold">{deleteUser.name}</span>
             </p>
             <div className="mt-6 flex flex-wrap items-center justify-end gap-3">
               <Button variant="outline" size="lg" onClick={closeModals}>

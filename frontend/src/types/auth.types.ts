@@ -33,4 +33,5 @@ export interface AuthContextValue {
   isLoading: boolean;
   setAuth: (token: string, user: User | null) => void;
   logout: () => void;
+  updateUser: (updatedUser: User) => void;
 }

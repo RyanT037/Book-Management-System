@@ -1,6 +1,8 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Library } from 'lucide-react';
 import type { ReactNode } from 'react';
+import { statsService } from '../../services/stats.service';
 
 interface AuthLayoutProps {
   children: ReactNode;
@@ -9,6 +11,28 @@ interface AuthLayoutProps {
 }
 
 export function AuthLayout({ children, title, subtitle }: AuthLayoutProps) {
+  const [stats, setStats] = useState([
+    { label: 'Users', value: '...' },
+    { label: 'Books', value: '...' },
+  ]);
+
+  useEffect(() => {
+    statsService
+      .getPublicStats()
+      .then((data) => {
+        setStats([
+          { label: 'Users', value: data.registeredUsers.toLocaleString() },
+          { label: 'Books', value: data.totalBooks.toLocaleString() },
+        ]);
+      })
+      .catch(() => {
+        setStats([
+          { label: 'Users', value: 'N/A' },
+          { label: 'Books', value: 'N/A' },
+        ]);
+      });
+  }, []);
+
   return (
     <div className="min-h-svh bg-slate-50">
       <div className="grid min-h-svh lg:grid-cols-2">
@@ -38,10 +62,7 @@ export function AuthLayout({ children, title, subtitle }: AuthLayoutProps) {
               members, and borrowing — all in one professional workspace.
             </p>
             <div className="mt-8 grid grid-cols-2 gap-3">
-              {[
-                { label: 'Categories', value: '8' },
-                { label: 'Books', value: '156' },
-              ].map((item) => (
+              {stats.map((item) => (
                 <div
                   key={item.label}
                   className="rounded-2xl bg-white/15 p-4 backdrop-blur-sm"

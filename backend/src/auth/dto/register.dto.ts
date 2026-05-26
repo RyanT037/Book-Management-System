@@ -16,4 +16,6 @@ export class RegisterDto {
     @IsString()
     @IsNotEmpty()
     username!: string;
+    
+    // Role cannot be set during public registration - it defaults to USER on the server
 }

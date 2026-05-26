@@ -1,7 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 import { PrismaService } from '../prisma/prisma.service';
+import { Role } from 'src/generated/prisma/browser';
 
 @Injectable()
 export class BooksService {
@@ -21,20 +22,17 @@ export class BooksService {
     });
   }
 
-  // 2. Simplified: Retrieve all books belonging to the user without pagination complexity
-  findAll(userId: number) {
+  // 2. Retrieve all books in the DB (all users can view all books)
+  findAll() {
     return this.prisma.book.findMany({
-      where: { userId },
-      orderBy: { createdAt: 'desc' }, // Keeps newest books at the top
+      orderBy: { createdAt: 'desc' },
     });
   }
 
   // 3. Retrieve a single book safely
-  async findOne(id: number, userId: number) {
-    const book = await this.prisma.book.findFirst({
-      where: { id, userId },
-    });
-    
+  async findOne(id: number) {
+    const book = await this.prisma.book.findUnique({ where: { id } });
+
     if (!book) {
       throw new NotFoundException(`Book with id ${id} not found`);
     }
@@ -42,20 +40,27 @@ export class BooksService {
   }
 
   // 4. Update a book directly using fields passed in the DTO
-  async update(id: number, dto: UpdateBookDto, userId: number) {
-    // Reuses the findOne method logic to verify ownership/existence first
-    await this.findOne(id, userId);
+  async update(id: number, dto: UpdateBookDto, userId: number, role: Role) {
+    const book = await this.prisma.book.findUnique({ where: { id } });
+    if (!book) throw new NotFoundException(`Book with id ${id} not found`);
 
-    return this.prisma.book.update({
-      where: { id },
-      data: dto,
-    });
+    // Allow update only for owner or admin
+    if (book.userId !== userId && role !== Role.ADMIN) {
+      throw new ForbiddenException('You do not have permission to update this book');
+    }
+
+    return this.prisma.book.update({ where: { id }, data: dto });
   }
 
   // 5. Delete a book
-  async remove(id: number, userId: number) {
-    // Reuses the findOne method logic to verify ownership/existence first
-    await this.findOne(id, userId);
+  async remove(id: number, role: Role) {
+    const book = await this.prisma.book.findUnique({ where: { id } });
+    if (!book) throw new NotFoundException(`Book with id ${id} not found`);
+
+    // Only admins can delete books
+    if (role !== Role.ADMIN) {
+      throw new ForbiddenException('Only admins can delete books');
+    }
 
     await this.prisma.book.delete({ where: { id } });
     return { message: `Book ${id} deleted successfully` };

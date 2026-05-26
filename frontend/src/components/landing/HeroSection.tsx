@@ -1,9 +1,38 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, BookMarked, Library, Sparkles } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Container } from '../ui/Container';
+import { statsService } from '../../services/stats.service';
 
 export function HeroSection() {
+  const [stats, setStats] = useState([
+    { label: 'Total Users', value: '...', color: 'bg-stat-blue' },
+    { label: 'Total Books', value: '...', color: 'bg-stat-indigo' },
+    { label: 'Total Authors', value: '...', color: 'bg-stat-purple' },
+    { label: 'Reports', value: 'Live', color: 'bg-stat-coral' },
+  ]);
+
+  useEffect(() => {
+    statsService
+      .getPublicStats()
+      .then((data) => {
+        setStats([
+          { label: 'Total Users', value: data.registeredUsers.toLocaleString(), color: 'bg-stat-blue' },
+          { label: 'Total Books', value: data.totalBooks.toLocaleString(), color: 'bg-stat-indigo' },
+          { label: 'Total Authors', value: data.activeAuthors.toLocaleString(), color: 'bg-stat-purple' },
+          { label: 'Reports', value: 'Live', color: 'bg-stat-coral' },
+        ]);
+      })
+      .catch(() => {
+        setStats([
+          { label: 'Total Users', value: 'N/A', color: 'bg-stat-blue' },
+          { label: 'Total Books', value: 'N/A', color: 'bg-stat-indigo' },
+          { label: 'Total Authors', value: 'N/A', color: 'bg-stat-purple' },
+          { label: 'Reports', value: 'Live', color: 'bg-stat-coral' },
+        ]);
+      });
+  }, []);
   return (
     <section className="relative overflow-hidden bg-gradient-hero pt-12 pb-20 md:pt-20 md:pb-28">
       <div
@@ -27,7 +56,7 @@ export function HeroSection() {
               <span className="text-gradient-brand">Made Simple</span>
             </h1>
             <p className="mt-6 max-w-xl text-base leading-relaxed text-slate-600 sm:text-lg lg:mx-0 mx-auto">
-              Manage books, users, borrowing, and library operations efficiently
+              Manage books, users, and library operations efficiently
               with a clean modern platform.
             </p>
             <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center lg:justify-start">
@@ -51,12 +80,7 @@ export function HeroSection() {
                 <Library className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8" strokeWidth={1.5} />
               </div>
               <div className="grid grid-cols-2 gap-4 sm:pt-2 md:pt-6">
-                {[
-                  { label: 'Catalog', value: '1.2k', color: 'bg-stat-blue' },
-                  { label: 'Members', value: '450', color: 'bg-stat-indigo' },
-                  { label: 'Borrowed', value: '320', color: 'bg-stat-purple' },
-                  { label: 'Reports', value: 'Live', color: 'bg-stat-coral' },
-                ].map((item) => (
+                {stats.map((item) => (
                   <div
                     key={item.label}
                     className={`rounded-2xl ${item.color} p-5 text-white shadow-sm transition-transform duration-300 hover:scale-[1.02]`}

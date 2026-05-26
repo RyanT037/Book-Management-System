@@ -9,7 +9,6 @@ export const loginSchema = z.object({
     .string()
     .min(1, 'Password is required')
     .min(6, 'Password must be at least 6 characters'),
-  rememberMe: z.boolean().optional(),
 });
 
 export type LoginFormValues = z.infer<typeof loginSchema>;
@@ -20,6 +19,10 @@ export const registerSchema = z
       .string()
       .min(1, 'Name is required')
       .min(2, 'Name must be at least 2 characters'),
+    username: z
+      .string()
+      .min(1, 'Username is required')
+      .min(3, 'Username must be at least 3 characters'),
     email: z
       .string()
       .min(1, 'Email is required')

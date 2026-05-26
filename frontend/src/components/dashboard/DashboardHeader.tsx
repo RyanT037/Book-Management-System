@@ -2,10 +2,12 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Menu, User } from 'lucide-react';
 import { useUiStore } from '../../store/ui.store';
+import { useAuthActions } from '../../hooks/useAuthActions';
 
 export function DashboardHeader() {
   const toggleSidebar = useUiStore((s) => s.toggleSidebar);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { logout } = useAuthActions();
 
   const toggleUserMenu = () => setIsMenuOpen((prev) => !prev);
 
@@ -31,7 +33,7 @@ export function DashboardHeader() {
           onClick={toggleUserMenu}
           className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-indigo-500 text-white shadow-sm transition hover:opacity-90"
           aria-label="Open user menu"
-          aria-expanded={isMenuOpen}
+          aria-expanded={isMenuOpen ? 'true' : 'false'}
         >
           <User className="h-5 w-5" />
         </button>
@@ -50,6 +52,10 @@ export function DashboardHeader() {
               <button
                 type="button"
                 className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-50"
+                onClick={() => {
+                  logout();
+                  setIsMenuOpen(false);
+                }}
               >
                 <span className="inline-block h-4 w-4 rounded-full bg-slate-200" />
                 <span>Logout</span>
