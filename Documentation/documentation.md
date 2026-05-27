@@ -821,7 +821,7 @@ Statistics are calculated from real database records using counts and author gro
 - Profile editing UI.
 - Axios API layer with token injection.
 
-### Current Implementation Notes
+### Conclusion
 
 - Public registration creates a `USER` account and returns the safe user object.
 - Login returns both `access_token` and the safe user profile.
@@ -830,12 +830,3 @@ Statistics are calculated from real database records using counts and author gro
 - Book deletion is admin-only on the backend.
 - Book updates are allowed for the book owner or an admin.
 
-### Recommended Next Steps
-
-- Align the registration frontend with the backend response, or update the backend to issue a token on registration.
-- Hide or restrict the users page in the frontend for non-admin users.
-- Add backend authorization checks so users can only update their own profile unless they are admins.
-- Add pagination and server-side search for large book lists.
-- Add automated tests for auth, books, users, and stats.
-- Add seed data for local development and demos.
-- Add deployment documentation for production environments.
