@@ -2,404 +2,564 @@
 
 ## Table of Contents
 1. [Project Overview](#1-project-overview)
-2. [Technologies Used](#2-technologies-used)
+2. [Technology Stack](#2-technology-stack)
 3. [System Architecture](#3-system-architecture)
-4. [Database Design](#4-database-design)
-5. [API Endpoints](#5-api-endpoints)
-6. [Authentication Flow](#6-authentication-flow)
-7. [Security Implementation](#7-security-implementation)
-8. [Input Validation](#8-input-validation)
-9. [Installation Instructions](#9-installation-instructions)
-10. [Setup Instructions](#10-setup-instructions)
-11. [Screenshots of the Application](#11-screenshots-of-the-application)
-12. [Challenges Faced](#12-challenges-faced)
-13. [Conclusion](#13-conclusion)
+4. [Backend Application](#4-backend-application)
+5. [Frontend Application](#5-frontend-application)
+6. [Database Design](#6-database-design)
+7. [API Endpoints](#7-api-endpoints)
+8. [Authentication and Authorization](#8-authentication-and-authorization)
+9. [Validation and Security](#9-validation-and-security)
+10. [Setup and Installation](#10-setup-and-installation)
+11. [Implemented User Workflows](#11-implemented-user-workflows)
+12. [Migrations](#12-migrations)
+13. [Challenges Faced](#13-challenges-faced)
+14. [Current Status and Next Steps](#14-current-status-and-next-steps)
 
 ---
 
 ## 1. Project Overview
-The **Full-Stack Book Management System** is a multi-tier, robust web application engineered to catalog books, track availability configurations, and coordinate user account properties.
 
-- **Purpose of the System**: To provide users with a dynamic, unified digital environment for indexing books, monitoring availability status, and checking structural details.
-- **What Problem the Application Solves**: It addresses the fragmentation and synchronization issues typical of spreadsheet logging or analog bookkeeping. By establishing a central relational database coupled with validation schemas, it guarantees data integrity, search indexing, and real-time state management.
-- **High-Level Project Objective**: To build a secure, full-stack application with JWT-based authentication, role-aware user accounts, protected API routes, password hashing, and comprehensive input validation — forming a solid foundation for the book catalog features.
+The **Full-Stack Book Management System** is a complete web application for managing a digital book catalog with secure user accounts, role-aware access control, dashboard statistics, and a React-based administration interface.
+
+The system now includes:
+
+- Public landing page with application statistics.
+- User registration and login.
+- JWT-protected dashboard routes.
+- Book creation, listing, editing, searching, and deletion workflows.
+- User management for administrators.
+- Profile editing for authenticated users.
+- PostgreSQL persistence through Prisma ORM.
+- Swagger API documentation at `/api`.
+
+The main goal of the project is to provide a reliable library/catalog management foundation where users can manage books while administrators can oversee users and restricted operations.
 
 ---
 
-## 2. Technologies Used
-Only the packages and engines actively installed and configured in the project are documented below:
+## 2. Technology Stack
 
-### NestJS
-- **Role in System**: Serves as the high-performance backend REST API framework.
-- **Why Chosen**: It provides a highly structured modular pattern using Dependency Injection, which ensures strong testability, code isolation, and easy extensibility.
+### Backend
 
-### React (`^19.2.6`)
-- **Role in System**: Powers the Single-Page Application (SPA) client interface.
-- **Why Chosen**: React offers lightning-fast component rendering and state mapping. By selecting React 19, the UI benefits from the latest rendering optimization APIs.
+| Technology | Version / Package | Role |
+| :--- | :--- | :--- |
+| NestJS | `@nestjs/* ^11.0.1` | Modular REST API framework. |
+| TypeScript | `^5.7.3` | Type-safe backend language. |
+| PostgreSQL | Local server | Relational database. |
+| Prisma ORM | `prisma`, `@prisma/client ^7.8.0` | Type-safe database schema and query layer. |
+| Prisma PostgreSQL Adapter | `@prisma/adapter-pg ^7.8.0` | Native JavaScript PostgreSQL driver adapter. |
+| bcrypt | `^6.0.0` | Password hashing. |
+| Passport JWT | `@nestjs/passport`, `passport-jwt` | JWT authentication strategy. |
+| Nest JWT | `@nestjs/jwt ^11.0.2` | Token signing and verification support. |
+| class-validator | `^0.15.1` | DTO validation. |
+| Swagger | `@nestjs/swagger`, `swagger-ui-express` | API documentation UI. |
 
-### PostgreSQL
-- **Role in System**: Functions as the primary relational database storage engine.
-- **Why Chosen**: PostgreSQL is a highly robust, SQL-compliant, and ACID-compliant relational engine that ensures strict data durability, referential integrity, and efficient index execution for book lookups.
+### Frontend
 
-### Prisma ORM (`^7.8.0`)
-- **Role in System**: Operates as the Object-Relational Mapping (ORM) and schema generator engine.
-- **Why Chosen**: Prisma abstracts database interactions into type-safe methods. Its declarative schema makes managing changes simple, and its migration pipeline ensures repeatable setups.
-
-### TypeScript (`^5.7.3` on Backend)
-- **Role in System**: Serves as the core programming language for the backend API and build scripts.
-- **Why Chosen**: TypeScript guarantees compiler-level type safety, minimizing runtime exceptions and enhancing IDE autocompletion for database and API models.
-
-### Vite (`^8.0.12`)
-- **Role in System**: Operates as the fast development server and bundler for the React client.
-- **Why Chosen**: Vite provides rapid Hot Module Replacement (HMR) speeds, avoiding the slow startup cycles associated with legacy Webpack configurations.
-
-### Node.js
-- **Role in System**: Represents the physical backend environment runtime.
-- **Why Chosen**: Node.js features an asynchronous event-driven loop that scales exceptionally well for concurrent network operations and enables a unified JavaScript syntax across layers.
-
-### bcrypt
-- **Role in System**: Handles cryptographic password hashing before persisting user credentials to the database.
-- **Why Chosen**: bcrypt is the industry-standard adaptive hashing algorithm for passwords, providing configurable salt rounds and resistance to brute-force attacks.
-
-### @nestjs/jwt & passport-jwt
-- **Role in System**: Issues and validates JSON Web Tokens for stateless session management.
-- **Why Chosen**: JWT is a compact, self-contained token standard that allows the backend to verify identity without storing session state, making the API horizontally scalable.
-
-### class-validator & class-transformer
-- **Role in System**: Enforces strict input validation rules on all incoming DTO (Data Transfer Object) payloads via decorators.
-- **Why Chosen**: Integrates natively with NestJS's `ValidationPipe`, providing declarative, decorator-based validation without manual conditional checks.
+| Technology | Version / Package | Role |
+| :--- | :--- | :--- |
+| React | `^19.2.6` | Single-page frontend application. |
+| React DOM | `^19.2.6` | Browser rendering. |
+| Vite | `^8.0.12` | Development server and build tool. |
+| TypeScript | `^6.0.3` | Type-safe frontend code. |
+| React Router | `react-router-dom ^7.15.1` | Client-side routing. |
+| Axios | `^1.16.1` | HTTP client for backend requests. |
+| React Hook Form | `^7.76.1` | Form handling for book workflows. |
+| React Hot Toast | `^2.6.0` | User notifications. |
+| Tailwind CSS | `^4.3.0` | Utility-first styling. |
+| Lucide React | `^1.16.0` | UI icons. |
 
 ---
 
 ## 3. System Architecture
-The application is structured into three decoupled architectural tiers that interact continuously.
 
-- **Frontend Layer (React + Vite)**: A single-page client application rendering the UI component trees. It interacts with the backend strictly through HTTP requests using configured Axios client handlers.
-- **Backend Layer (NestJS)**: An API cluster designed with isolated modules (`AuthModule`, `UsersModule`, `PrismaModule`). It processes network endpoints via controllers, executes validation checks, manages JWT authentication, and calls the database client.
-- **Prisma ORM Layer (@prisma/adapter-pg)**: An intermediate database interface layer that maps SQL tables to TypeScript definitions. It implements the custom native JavaScript connection driver `@prisma/adapter-pg` to route operations.
-- **Database Layer (PostgreSQL)**: The structural persistence store holding primary keys, foreign key constraints, indices, and transactional data records.
+The application is organized as a monorepo with separate backend and frontend projects:
 
-### Architecture Flow Diagram
 ```text
-  +-------------------------------------------------+
-  |                 Frontend Layer                  |
-  |             React 19 SPA (Vite 8)               |
-  +-----------------------+-------------------------+
-                          |
-                          | HTTP REST Requests
-                          v
-  +-----------------------+-------------------------+
-  |                 Backend Layer                   |
-  |  AuthModule | UsersModule | PrismaModule        |
-  |  JWT Guard  | ValidationPipe | JwtStrategy      |
-  +-----------------------+-------------------------+
-                          |
-                          | Type-Safe DB Actions
-                          v
-  +-----------------------+-------------------------+
-  |               Prisma ORM Layer                  |
-  |            (@prisma/adapter-pg)                 |
-  +-----------------------+-------------------------+
-                          |
-                          | Native PostgreSQL Driver
-                          v
-  +-----------------------+-------------------------+
-  |                 Database Layer                  |
-  |               PostgreSQL Instance               |
-  +-------------------------------------------------+
+Book-Management-System/
+|-- backend/        # NestJS API, Prisma schema, migrations
+|-- frontend/       # React/Vite SPA
+`-- Documentation/  # Project documentation
 ```
 
-### Module Structure
+### Runtime Architecture
+
+```text
++-------------------------------------------------+
+|                 Frontend Layer                  |
+|   React 19 SPA, React Router, Axios, Tailwind   |
++-----------------------+-------------------------+
+                        |
+                        | HTTP REST Requests
+                        | Authorization: Bearer <jwt>
+                        v
++-----------------------+-------------------------+
+|                  Backend Layer                  |
+| AuthModule | UsersModule | BooksModule | Stats  |
+| JwtStrategy | ValidationPipe | Swagger | CORS   |
++-----------------------+-------------------------+
+                        |
+                        | Prisma Client Queries
+                        v
++-----------------------+-------------------------+
+|                Prisma ORM Layer                 |
+| Generated client at backend/src/generated/prisma |
+| PostgreSQL adapter: @prisma/adapter-pg          |
++-----------------------+-------------------------+
+                        |
+                        | Native PostgreSQL Driver
+                        v
++-----------------------+-------------------------+
+|               PostgreSQL Database              |
+| User table | Book table | Role enum             |
++-------------------------------------------------+
+```
+
+### Backend Module Structure
+
 ```text
 backend/src/
-├── app.module.ts          # Root module — registers ConfigModule, AuthModule, UsersModule, PrismaModule
-├── main.ts                # Bootstrap — mounts global ValidationPipe
-├── auth/
-│   ├── auth.module.ts     # Registers JwtModule (async), PassportModule, JwtStrategy
-│   ├── auth.controller.ts # POST /auth/register, POST /auth/login
-│   ├── auth.service.ts    # Registration + login business logic
-│   ├── jwt.strategy.ts    # Passport JWT strategy (validates Bearer tokens)
-│   ├── dto/
-│   │   ├── register.dto.ts  # Validated DTO for registration
-│   │   └── login.dto.ts     # Validated DTO for login
-│   └── decorators/
-│       └── get-user.decorator.ts  # @GetUser() param decorator
-└── users/
-    ├── users.module.ts    # Registers UsersController, UsersService
-    ├── users.controller.ts # Full CRUD — protected by JWT guard
-    ├── users.service.ts   # Prisma CRUD operations with password hashing
-    └── dto/
-        ├── create-user.dto.ts  # Validated DTO for user creation
-        └── update-user.dto.ts  # Partial DTO extending CreateUserDto
+|-- app.module.ts
+|-- app.controller.ts
+|-- app.service.ts
+|-- main.ts
+|-- auth/
+|   |-- auth.module.ts
+|   |-- auth.controller.ts
+|   |-- auth.service.ts
+|   |-- jwt.strategy.ts
+|   `-- dto/
+|-- books/
+|   |-- books.module.ts
+|   |-- books.controller.ts
+|   |-- books.service.ts
+|   `-- dto/
+|-- stats/
+|   |-- stats.module.ts
+|   |-- stats.controller.ts
+|   `-- stats.service.ts
+|-- users/
+|   |-- users.module.ts
+|   |-- users.controller.ts
+|   |-- users.service.ts
+|   `-- dto/
+|-- prisma/
+|   |-- prisma.module.ts
+|   `-- prisma.service.ts
+`-- generated/prisma/
 ```
 
----
-
-## 4. Database Design
-The relational database layer features two core tables configured in `backend/prisma/schema.prisma` in a strict one-to-many relationship mapping.
+### Frontend Structure
 
 ```text
-+-------------------+             +-----------------------+
-|     User          |             |       Book            |
-+-------------------+             +-----------------------+
-| id (PK)           |             | id (PK)               |
-| email (Unique)    | <---------+ | title                 |
-| name              |             | author                |
-| username (Unique) |             | isbn (Unique)         |
-| password          |             | publishedYear         |
-| role              |             | description           |
-| createdAt         |             | available             |
-|                   |             | createdAt             |
-|                   |             | userId (FK)           |
-+-------------------+             +-----------------------+
+frontend/src/
+|-- App.tsx
+|-- main.tsx
+|-- routes/
+|   `-- AppRoutes.tsx
+|-- context/
+|   `-- AuthContext.tsx
+|-- services/
+|   |-- api.ts
+|   |-- auth.service.ts
+|   |-- book.service.ts
+|   |-- stats.service.ts
+|   `-- users.service.ts
+|-- pages/
+|   |-- public/
+|   |-- auth/
+|   `-- dashboard/
+|-- components/
+|   |-- auth/
+|   |-- dashboard/
+|   |-- landing/
+|   `-- ui/
+`-- types/
 ```
-
-### User Model
-The User model stores credentials, profile details, and role assignments for users authorized to catalog books.
-
-| Field Name | Type | Modifiers / Attributes | Field Purpose |
-| :--- | :--- | :--- | :--- |
-| `id` | `Int` | `@id`, `@default(autoincrement())` | Unique auto-incremented identifier (Primary Key). |
-| `email` | `String` | `@unique` | Distinct email address used for account operations. |
-| `name` | `String` | None | User's profile display name. |
-| `username` | `String` | `@unique` | Distinct username handle used during login checks. |
-| `password` | `String` | None | bcrypt-hashed security password string (never stored in plaintext). |
-| `role` | `String` | `@default("USER")` | Access role assigned to the user. Defaults to `"USER"`. Can be elevated to `"ADMIN"`. |
-| `createdAt`| `DateTime`| `@default(now())` | Creation date record of the user database row. |
-| `books` | `Book[]` | Virtual Relation Property | Array mapping to all Book records cataloged by this User. |
-
-### Book Model
-The Book model catalogs standard publication details and links each item to a managing user.
-
-| Field Name | Type | Modifiers / Attributes | Field Purpose |
-| :--- | :--- | :--- | :--- |
-| `id` | `Int` | `@id`, `@default(autoincrement())` | Unique auto-incremented identifier (Primary Key). |
-| `title` | `String` | None | The title of the book record. |
-| `author` | `String` | None | The name of the book's author. |
-| `isbn` | `String` | `@unique` | The International Standard Book Number (unique search key). |
-| `publishedYear`| `Int` | None | Integer indicating the year the book was published. |
-| `description`| `String` | None | Text area describing the book or context. |
-| `available`| `Boolean`| `@default(true)` | Toggle flag indicating if the book is available. |
-| `createdAt`| `DateTime`| `@default(now())` | Row creation timestamp. |
-| `userId` | `Int` | Foreign Key | Integer identifying the User who cataloged the Book record. |
-| `user` | `User` | Relation Mapper | Connection reference back to parent User model instance. |
-
-### Relationship Explanation
-- **One-to-Many Connection**: A `User` can own or catalog many books (`books Book[]`). Conversely, a `Book` is strictly linked to a single `User` (`user User @relation(fields: [userId], references: [id])`).
-- **Database Constraints**:
-  ```sql
-  ALTER TABLE "Book" ADD CONSTRAINT "Book_userId_fkey"
-  FOREIGN KEY ("userId") REFERENCES "User"("id")
-  ON DELETE RESTRICT ON UPDATE CASCADE;
-  ```
-  The database enforces referential safety with `ON DELETE RESTRICT`, preventing a user from being deleted if they have active book records cataloged in the system.
-
-### Migrations Applied
-| Migration Name | Description |
-| :--- | :--- |
-| `20260522183432_init` | Initial schema — creates `User` and `Book` tables with all base fields and foreign key constraints. |
-| `add_role_to_user` | Adds `role String @default("USER")` column to the `User` table to support role-based access control. |
 
 ---
 
-## 5. API Endpoints
+## 4. Backend Application
 
-### Authentication Endpoints (`/auth`)
-These endpoints are **public** — no JWT token is required.
+The backend is a NestJS REST API running on port `3000` by default. It uses `ConfigModule` globally, connects to PostgreSQL through `PrismaService`, and enables CORS for the frontend development origin:
+
+```typescript
+app.enableCors({
+  origin: 'http://localhost:5173',
+  credentials: true,
+});
+```
+
+### Main Backend Modules
+
+| Module | Purpose |
+| :--- | :--- |
+| `AuthModule` | Handles registration, login, JWT signing, and JWT validation. |
+| `UsersModule` | Handles user CRUD operations and admin-only user management. |
+| `BooksModule` | Handles book CRUD operations with owner/admin authorization rules. |
+| `StatsModule` | Provides public and authenticated dashboard statistics. |
+| `PrismaModule` | Provides a shared Prisma database client. |
+
+### Swagger Documentation
+
+Swagger is configured in `backend/src/main.ts` and is available at:
+
+```text
+http://localhost:3000/api
+```
+
+The Swagger document includes:
+
+- Authentication endpoints.
+- Bearer token configuration.
+- Users endpoints.
+- Books endpoints.
+- Statistics endpoints.
+- Request and response examples.
+
+---
+
+## 5. Frontend Application
+
+The frontend is a React/Vite single-page application running on port `5173` by default. It communicates with the backend using Axios.
+
+### Routes
+
+| Route | Page | Access |
+| :--- | :--- | :--- |
+| `/` | Landing page | Public |
+| `/login` | Login form | Public |
+| `/register` | Registration form | Public |
+| `/dashboard` | Dashboard overview | Protected |
+| `/dashboard/books` | Book management table | Protected |
+| `/dashboard/users` | User management table | Intended for admins |
+| `/dashboard/profile` | Profile editing page | Protected |
+| `*` | Redirects to `/` | Public |
+
+### Authentication State
+
+Authentication state is stored in `AuthContext`. The frontend persists:
+
+- `access_token` in `localStorage`.
+- `user` profile data in `localStorage`.
+
+Axios request interceptors attach the JWT automatically:
+
+```text
+Authorization: Bearer <access_token>
+```
+
+Axios response interceptors clear the local token and user data when the API returns `401 Unauthorized`.
+
+### Implemented UI Areas
+
+- Public marketing/landing page.
+- Login page.
+- Register page.
+- Dashboard overview with live statistics.
+- Books table with search, create, edit, and delete modals.
+- Users table with create, edit, and delete modals.
+- Profile page with account editing.
+- Shared dashboard layout, sidebar, header, buttons, inputs, and cards.
+
+---
+
+## 6. Database Design
+
+The database is defined in `backend/prisma/schema.prisma`.
+
+### Prisma Schema
+
+```prisma
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  name      String
+  username  String   @unique
+  password  String
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+
+  books Book[]
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model Book {
+  id            Int      @id @default(autoincrement())
+  title         String
+  author        String
+  isbn          String   @unique
+  publishedYear Int
+  description   String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
+}
+```
+
+### User Table
+
+| Field | Type | Constraint / Behavior |
+| :--- | :--- | :--- |
+| `id` | `Int` | Primary key, auto-incremented. |
+| `email` | `String` | Unique. Used for login. |
+| `name` | `String` | User display name. |
+| `username` | `String` | Unique handle. |
+| `password` | `String` | bcrypt hash. |
+| `role` | `Role` | Enum: `USER` or `ADMIN`; defaults to `USER`. |
+| `createdAt` | `DateTime` | Defaults to creation timestamp. |
+| `books` | `Book[]` | One-to-many relation to books. |
+
+### Book Table
+
+| Field | Type | Constraint / Behavior |
+| :--- | :--- | :--- |
+| `id` | `Int` | Primary key, auto-incremented. |
+| `title` | `String` | Required title. |
+| `author` | `String` | Required author. |
+| `isbn` | `String` | Unique ISBN value. |
+| `publishedYear` | `Int` | Publication year. |
+| `description` | `String` | Book description. |
+| `createdAt` | `DateTime` | Defaults to creation timestamp. |
+| `updatedAt` | `DateTime` | Automatically updated by Prisma. |
+| `userId` | `Int` | Foreign key to `User`. |
+| `user` | `User` | Parent user relation. |
+
+### Relationship
+
+A user can catalog many books. Each book belongs to one user.
+
+```text
+User 1 ------ * Book
+```
+
+The database uses the Prisma-generated relation between `Book.userId` and `User.id`.
+
+---
+
+## 7. API Endpoints
+
+Base URL during development:
+
+```text
+http://localhost:3000
+```
+
+### Core Endpoint
+
+| Method | Path | Auth | Description |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/` | Public | Returns `Hello World!`. |
+
+### Authentication Endpoints
+
+| Method | Path | Auth | Description |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/auth/register` | Public | Creates a new user account with role `USER`. |
+| `POST` | `/auth/login` | Public | Authenticates a user and returns a JWT access token plus user profile. |
 
 #### `POST /auth/register`
-Registers a new user account.
 
-- **Controller**: `AuthController`
-- **Service Method**: `AuthService.register(dto)`
-- **Request Body** (`RegisterDto`):
-  ```json
-  {
-    "email": "user@example.com",
-    "password": "secret123",
-    "name": "John Doe",
-    "username": "johndoe"
+Request:
+
+```json
+{
+  "email": "reader@example.com",
+  "password": "password123",
+  "name": "Jane Reader",
+  "username": "janereader"
+}
+```
+
+Current response:
+
+```json
+{
+  "user": {
+    "id": 1,
+    "email": "reader@example.com",
+    "name": "Jane Reader",
+    "username": "janereader",
+    "role": "USER"
   }
-  ```
-- **Validation Rules**:
-  - `email` — must be a valid email format (`@IsEmail`)
-  - `password` — minimum 6 characters (`@MinLength(6)`)
-  - `name` — required, non-empty string
-  - `username` — required, non-empty string
-- **Success Response** (`200 OK`):
-  ```json
-  {
-    "message": "User registered successfully",
-    "user": {
-      "id": 1,
-      "email": "user@example.com",
-      "name": "John Doe",
-      "username": "johndoe",
-      "role": "USER",
-      "createdAt": "2026-05-23T..."
-    }
-  }
-  ```
-  > **Note**: The `password` field is stripped from the response object before returning.
-- **Error Responses**:
-  - `400 Bad Request` — email already registered, or validation failure
-  
+}
+```
+
 #### `POST /auth/login`
-Authenticates an existing user and returns a signed JWT access token.
 
-- **Controller**: `AuthController`
-- **Service Method**: `AuthService.login(dto)`
-- **Request Body** (`LoginDto`):
-  ```json
-  {
-    "email": "user@example.com",
-    "password": "secret123"
+Request:
+
+```json
+{
+  "email": "reader@example.com",
+  "password": "password123"
+}
+```
+
+Response:
+
+```json
+{
+  "access_token": "<jwt-token>",
+  "user": {
+    "id": 1,
+    "email": "reader@example.com",
+    "name": "Jane Reader",
+    "username": "janereader",
+    "role": "USER",
+    "createdAt": "2026-05-27T08:00:00.000Z"
   }
-  ```
-- **Validation Rules**:
-  - `email` — must be a valid email format
-  - `password` — required, non-empty
-- **Success Response** (`200 OK`):
-  ```json
-  {
-    "access_token": "<signed_jwt_token>"
-  }
-  ```
-- **Error Responses**:
-  - `401 Unauthorized` — user not found, or password does not match
+}
+```
+
+### Books Endpoints
+
+All book endpoints require a JWT bearer token.
+
+| Method | Path | Auth | Role Rule | Description |
+| :--- | :--- | :--- | :--- | :--- |
+| `POST` | `/books` | Required | Any authenticated user | Creates a book linked to the logged-in user. |
+| `GET` | `/books` | Required | Any authenticated user | Returns all books, newest first. |
+| `GET` | `/books/:id` | Required | Any authenticated user | Returns one book by ID. |
+| `PUT` | `/books/:id` | Required | Owner or admin | Updates a book. |
+| `DELETE` | `/books/:id` | Required | Admin only | Deletes a book. |
+
+#### Create Book Body
+
+```json
+{
+  "title": "Clean Code",
+  "author": "Robert C. Martin",
+  "isbn": "9780132350884",
+  "publishedYear": 2008,
+  "description": "A practical guide to writing readable and maintainable code."
+}
+```
+
+### Users Endpoints
+
+All user endpoints require a JWT bearer token. Some actions are explicitly admin-only in the controller.
+
+| Method | Path | Auth | Role Rule | Description |
+| :--- | :--- | :--- | :--- | :--- |
+| `POST` | `/users` | Required | Admin only | Creates a user account. |
+| `GET` | `/users` | Required | Admin only | Returns all users. |
+| `GET` | `/users/:id` | Required | Authenticated user | Returns one user by ID. |
+| `PATCH` | `/users/:id` | Required | Authenticated user | Updates a user. |
+| `DELETE` | `/users/:id` | Required | Admin only | Deletes a user. |
+
+#### Create User Body
+
+```json
+{
+  "email": "staff@example.com",
+  "name": "Staff User",
+  "username": "staffuser",
+  "password": "password123",
+  "role": "USER"
+}
+```
+
+### Statistics Endpoints
+
+| Method | Path | Auth | Description |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/stats/public` | Public | Returns public landing page totals. |
+| `GET` | `/stats/dashboard` | Required | Returns dashboard totals for authenticated users. |
+
+#### Public Stats Response
+
+```json
+{
+  "totalBooks": 120,
+  "registeredUsers": 35,
+  "activeAuthors": 48,
+  "recentBooks": 12
+}
+```
+
+#### Dashboard Stats Response
+
+```json
+{
+  "totalBooks": 120,
+  "totalUsers": 35,
+  "activeAuthors": 48,
+  "recentBooks": 12
+}
+```
 
 ---
 
-### Users Endpoints (`/users`)
-All endpoints in this group are **protected** — a valid `Authorization: Bearer <token>` header is required.
+## 8. Authentication and Authorization
 
-#### `POST /users`
-Creates a new user record directly (admin-level use).
-
-- **Guard**: `AuthGuard('jwt')`
-- **Request Body** (`CreateUserDto`): `email`, `name`, `username`, `password` (min 6 chars)
-- **Behaviour**: Hashes the password with bcrypt before persisting.
-- **Status Code**: `201 Created`
-
-#### `GET /users`
-Returns all user records from the database. Logs the requesting user's email server-side via the `@GetUser()` decorator.
-
-- **Guard**: `AuthGuard('jwt')`
-- **Status Code**: `200 OK`
-- **Response**: Array of all User objects.
-
-#### `GET /users/:id`
-Returns a single user record by their integer ID.
-
-- **Guard**: `AuthGuard('jwt')`
-- **URL Parameter**: `id` (integer)
-- **Status Code**: `200 OK`
-
-#### `PATCH /users/:id`
-Partially updates an existing user record. All fields from `CreateUserDto` are optional.
-
-- **Guard**: `AuthGuard('jwt')`
-- **Request Body** (`UpdateUserDto`): Any subset of `{ email, name, username, password }`
-- **Status Code**: `200 OK`
-
-#### `DELETE /users/:id`
-Permanently deletes a user record by their integer ID.
-
-- **Guard**: `AuthGuard('jwt')`
-- **URL Parameter**: `id` (integer)
-- **Status Code**: `200 OK`
-
----
-
-### Core Utility Endpoint
-- **URL Path**: `GET /`
-- **Controller**: `AppController`
-- **Method Action**: `getHello()`
-- **Return Type**: String (`Hello World!`)
-- **Status Code**: `200 OK`
-
----
-
-## 6. Authentication Flow
-
-The system uses a **stateless JWT-based authentication** strategy implemented via `@nestjs/jwt` and `passport-jwt`.
+### JWT Authentication Flow
 
 ```text
-[Client]                        [Backend]
-   |                                |
-   |-- POST /auth/register -------->|
-   |   { email, password, name,     |
-   |     username }                 |
-   |                                |-- Hash password (bcrypt, 10 rounds)
-   |                                |-- Check email uniqueness (Prisma)
-   |                                |-- Create user record
-   |                                |-- Strip password from response
-   |<-- { message, user (safe) } --|
-   |                                |
-   |-- POST /auth/login ----------->|
-   |   { email, password }          |
-   |                                |-- Find user by email
-   |                                |-- bcrypt.compare(inputPw, hashedPw)
-   |                                |-- Sign JWT { sub: userId, email }
-   |<-- { access_token: "..." } ---|
-   |                                |
-   |-- GET /users ----------------->|
-   |   Authorization: Bearer <jwt>  |
-   |                                |-- JwtStrategy validates token
-   |                                |-- Attaches { id, email } to request.user
-   |                                |-- Route handler executes
-   |<-- [ ...users ] --------------|
+[Client]                         [Backend]
+   |                                 |
+   |-- POST /auth/login ------------>|
+   |   email + password              |
+   |                                 |-- Find user by email
+   |                                 |-- Compare bcrypt hash
+   |                                 |-- Sign JWT payload
+   |<-- access_token + user ---------|
+   |                                 |
+   |-- GET /books ------------------>|
+   |   Authorization: Bearer token   |
+   |                                 |-- JwtStrategy validates token
+   |                                 |-- req.user = { id, email, role }
+   |<-- protected response ----------|
 ```
 
-### JWT Configuration
-- **Secret**: Loaded from `JWT_SECRET` environment variable via `ConfigService`.
-- **Expiry**: `1d` (24 hours).
-- **Algorithm**: HS256 (default).
-- **Extraction**: `ExtractJwt.fromAuthHeaderAsBearerToken()` — token must be supplied in the `Authorization` header as `Bearer <token>`.
+The JWT payload includes:
 
-### JwtStrategy (`jwt.strategy.ts`)
-The strategy validates all incoming tokens on protected routes. After successful verification, the decoded payload `{ sub, email }` is mapped to `{ id, email }` and attached to `request.user` automatically by Passport.
+```json
+{
+  "sub": 1,
+  "email": "reader@example.com",
+  "role": "USER"
+}
+```
+
+`JwtStrategy.validate()` maps this payload into:
+
+```typescript
+{ id: payload.sub, email: payload.email, role: payload.role }
+```
+
+### Role Rules
+
+| Action | USER | ADMIN |
+| :--- | :---: | :---: |
+| Register account | Yes | Yes |
+| Login | Yes | Yes |
+| View books | Yes | Yes |
+| Create books | Yes | Yes |
+| Update own books | Yes | Yes |
+| Update another user's books | No | Yes |
+| Delete books | No | Yes |
+| View all users | No | Yes |
+| Create users | No | Yes |
+| Delete users | No | Yes |
+
+### Stateless Logout
+
+The backend does not maintain server-side sessions. Logging out is handled on the frontend by clearing the stored JWT and user profile from `localStorage`.
 
 ---
 
-## 7. Security Implementation
+## 9. Validation and Security
 
-### Password Hashing
-Passwords are **never stored in plaintext**. Both `AuthService.register()` and `UsersService.create()` hash the raw password using bcrypt with a salt factor of `10` before calling `prisma.user.create()`.
+### Global Validation Pipe
 
-```typescript
-const hashedPassword = await bcrypt.hash(dto.password, 10);
-```
-
-### Safe Response Sanitization
-After a successful registration, the `password` field is explicitly destructured and excluded before the user object is returned to the client:
-
-```typescript
-const { password: _password, ...safeUser } = user;
-return { message: 'User registered successfully', user: safeUser };
-```
-
-This ensures the hashed password is never transmitted in any API response.
-
-### Route Protection
-All `/users` endpoints are protected using NestJS's `@UseGuards(AuthGuard('jwt'))` applied at the controller class level:
-
-```typescript
-@UseGuards(AuthGuard('jwt'))
-@Controller('users')
-export class UsersController { ... }
-```
-
-Any request without a valid, unexpired JWT will receive a `401 Unauthorized` response.
-
-### Generic Error Messages
-Login failures return the same `"Invalid credentials"` message regardless of whether the email was not found or the password was wrong. This prevents **user enumeration attacks**.
-
----
-
-## 8. Input Validation
-
-A global `ValidationPipe` is registered in `main.ts` with `whitelist: true`:
+The backend registers a global validation pipe:
 
 ```typescript
 app.useGlobalPipes(
@@ -409,204 +569,273 @@ app.useGlobalPipes(
 );
 ```
 
-- **`whitelist: true`**: Automatically strips any properties from incoming request bodies that are not declared in the DTO class. This prevents unexpected fields from being passed to services.
+This validates DTO decorators and strips unknown request body properties.
 
-### DTO Validation Rules
+### DTO Validation
 
 #### `RegisterDto`
-| Field | Decorators | Rule |
-| :--- | :--- | :--- |
-| `email` | `@IsEmail()`, `@IsNotEmpty()` | Must be a valid email address. |
-| `password` | `@IsNotEmpty()`, `@MinLength(6)` | Must be at least 6 characters long. |
-| `name` | `@IsString()`, `@IsNotEmpty()` | Must be a non-empty string. |
-| `username` | `@IsString()`, `@IsNotEmpty()` | Must be a non-empty string. |
+
+| Field | Rule |
+| :--- | :--- |
+| `email` | Required valid email. |
+| `password` | Required, minimum 6 characters. |
+| `name` | Required string. |
+| `username` | Required string. |
 
 #### `LoginDto`
-| Field | Decorators | Rule |
-| :--- | :--- | :--- |
-| `email` | `@IsEmail()` | Must be a valid email address. |
-| `password` | `@IsNotEmpty()` | Must be a non-empty value. |
+
+| Field | Rule |
+| :--- | :--- |
+| `email` | Valid email. |
+| `password` | Required. |
+
+#### `CreateBookDto`
+
+| Field | Rule |
+| :--- | :--- |
+| `title` | Required string. |
+| `author` | Required string. |
+| `isbn` | Required string. |
+| `publishedYear` | Integer. |
+| `description` | String. |
 
 #### `CreateUserDto`
-| Field | Decorators | Rule |
-| :--- | :--- | :--- |
-| `email` | `@IsEmail()`, `@IsNotEmpty()` | Must be a valid email address. |
-| `name` | `@IsString()`, `@IsNotEmpty()` | Must be a non-empty string. |
-| `username` | `@IsString()`, `@IsNotEmpty()` | Must be a non-empty string. |
-| `password` | `@IsString()`, `@IsNotEmpty()`, `@MinLength(6)` | Must be at least 6 characters. |
 
-#### `UpdateUserDto`
-Extends `PartialType(CreateUserDto)` from `@nestjs/mapped-types`. All fields from `CreateUserDto` become **optional**, while retaining their original validation decorators when a value is supplied.
+| Field | Rule |
+| :--- | :--- |
+| `email` | Required valid email. |
+| `name` | Required string. |
+| `username` | Required string. |
+| `password` | Required string, minimum 6 characters. |
+| `role` | Optional enum: `USER` or `ADMIN`. |
 
-### Custom Decorator: `@GetUser()`
-Located at `auth/decorators/get-user.decorator.ts`. This parameter decorator extracts the authenticated user object from the active HTTP request context (populated by `JwtStrategy.validate()`) and injects it directly into the controller method parameter.
+### Password Security
+
+Passwords are hashed using bcrypt with 10 salt rounds:
 
 ```typescript
-@Get()
-findAll(@GetUser() user: { id: number; email: string }) {
-  console.log('Requested by:', user.email);
-  return this.usersService.findAll();
-}
+await bcrypt.hash(password, 10);
 ```
+
+Login compares the submitted password against the stored hash:
+
+```typescript
+await bcrypt.compare(dto.password, user.password);
+```
+
+### Response Sanitization
+
+User responses select safe fields only. Password hashes are not returned from registration, login, user list, user detail, or user update responses.
+
+### Generic Login Errors
+
+Login failures return `Invalid credentials`, whether the email is missing or the password is wrong. This reduces user enumeration risk.
 
 ---
 
-## 9. Installation Instructions
+## 10. Setup and Installation
 
 ### Prerequisites
-- Node.js (v18 or higher)
-- PostgreSQL Server running locally on port `5432`
 
-### Environment Variables
-Create a `.env` file inside the `backend/` directory with the following keys:
+- Node.js 18 or higher.
+- npm.
+- PostgreSQL running locally.
+- A database available through `DATABASE_URL`.
+
+### Backend Environment
+
+Create `backend/.env`:
 
 ```env
-DATABASE_URL="postgresql://postgres:<password>@localhost:5432/postgres?schema=public"
-JWT_SECRET="your_strong_secret_key_here"
+DATABASE_URL="postgresql://postgres:password@localhost:5432/postgres?schema=public"
+JWT_SECRET="generate-your-own-random-secret-key"
+PORT=3000
 ```
 
-### Setup Steps
-1. **Clone Repository**:
-   ```bash
-   git clone <repository_url>
-   cd Book-Management-System
-   ```
+The included example file is `backend/.env.example`.
 
-2. **Database Provisioning**:
-   Ensure a local PostgreSQL instance is running on `localhost:5432`. Create a target database named `postgres` if it is not already present.
+### Backend Setup
 
-3. **Backend Environment Alignment**:
-   In `backend/.env`, set your `DATABASE_URL` and `JWT_SECRET`.
+```bash
+cd backend
+npm install
+npx prisma migrate dev
+npm run start:dev
+```
 
-4. **Install Backend Dependencies**:
-   ```bash
-   cd backend
-   npm install
-   ```
+Backend URLs:
 
-5. **Prisma Client Generation & Database Sync**:
-   Execute the migration pipeline to apply all schema definitions and generate the Prisma client:
-   ```bash
-   npx prisma migrate dev
-   ```
+```text
+API:     http://localhost:3000
+Swagger: http://localhost:3000/api
+```
 
-6. **Boot Backend Server**:
-   Launch the backend in watch/development mode:
-   ```bash
-   npm run start:dev
-   ```
+### Frontend Environment
 
-7. **Install Frontend Dependencies**:
-   In a separate terminal session, navigate to the frontend:
-   ```bash
-   cd ../frontend
-   npm install
-   ```
+The frontend defaults to `http://localhost:3000` for the API. To override it, create `frontend/.env`:
 
-8. **Boot Frontend Server**:
-   Launch the client application:
-   ```bash
-   npm run dev
-   ```
+```env
+VITE_API_URL=http://localhost:3000
+```
 
----
+### Frontend Setup
 
-## 10. Setup Instructions
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
-The following setup steps were successfully completed:
+Frontend URL:
 
-- **GitHub Repository Setup**:
-  Initialized the git repository under a clean monorepo architecture, dividing workspaces into separate `/backend` and `/frontend` directories, and configuring system-wide `.gitignore` settings.
+```text
+http://localhost:5173
+```
 
-- **NestJS Backend Initialization**:
-  Structured the backend skeleton using the Nest CLI. Integrated the `@nestjs/config` module to manage environment configurations globally.
+### Useful Commands
 
-- **React/Vite Frontend Initialization**:
-  Initialized the frontend single-page client application using Vite. Configured `vite.config.js` with dynamic compilation features and installed React 19 alongside helper communication frameworks.
+Backend:
 
-- **PostgreSQL Database Creation**:
-  Set up local databases, verified configuration mapping strings, and checked system endpoints.
+```bash
+npm run start:dev
+npm run build
+npm run lint
+npm run test
+npm run test:e2e
+```
 
-- **Prisma Initialization**:
-  Created `schema.prisma` mapping User and Book tables. Programmed `prisma.config.ts` using `defineConfig` to dynamically bind database paths from environment variables. Custom output path configured to `../src/generated/prisma`.
+Frontend:
 
-- **Migration Setup**:
-  Generated and applied migration script `20260522183432_init` using `prisma migrate dev`, generating the SQL structure and applying the schema definition to PostgreSQL.
-
-- **Authentication Module Implementation**:
-  Built the complete `AuthModule` with `AuthController`, `AuthService`, `JwtStrategy`, `RegisterDto`, and `LoginDto`. Implemented JWT-based stateless authentication using `@nestjs/jwt` and `passport-jwt`. JWT secret loaded securely via `ConfigService`.
-
-- **Security Hardening**:
-  Integrated `bcrypt` for password hashing (10 salt rounds). Enforced password field stripping from registration responses. Applied generic error messages on login to prevent user enumeration.
-
-- **Users CRUD Module**:
-  Scaffolded `UsersController` and `UsersService` with full Create, Read, Update, Delete operations. All routes protected globally at the controller level by `AuthGuard('jwt')`. Password hashing also applied in `UsersService.create()`.
-
-- **Global Validation Pipeline**:
-  Registered `ValidationPipe` globally in `main.ts` with `whitelist: true` to enforce DTO validation on all incoming requests and strip unauthorized fields.
-
-- **Custom Decorators**:
-  Implemented `@GetUser()` parameter decorator to cleanly extract the authenticated user from the request context in any protected controller method.
-
-- **Role Field Added to User Model**:
-  Added a `role String @default("USER")` field to the `User` Prisma model to support future role-based access control. Migration `add_role_to_user` applied.
+```bash
+npm run dev
+npm run build
+npm run lint
+npm run preview
+```
 
 ---
 
-## 11. Screenshots of the Application
+## 11. Implemented User Workflows
 
-> [INSERT SCREENSHOT: GitHub repository]
+### Public Visitor
 
-> [INSERT SCREENSHOT: Backend running terminal]
+1. Opens the landing page at `/`.
+2. Views public application statistics from `/stats/public`.
+3. Navigates to login or registration.
 
-> [INSERT SCREENSHOT: Frontend running in browser]
+### Registered User
 
-> [INSERT SCREENSHOT: PostgreSQL database created]
+1. Logs in through `/login`.
+2. Receives a JWT and user profile.
+3. Accesses `/dashboard`.
+4. Views dashboard statistics.
+5. Opens `/dashboard/books`.
+6. Searches books by title, author, ISBN, or description.
+7. Creates a new book.
+8. Updates books they own.
+9. Updates their profile at `/dashboard/profile`.
 
-> [INSERT SCREENSHOT: Prisma migration success]
+### Administrator
 
-> [INSERT SCREENSHOT: Prisma schema]
-
-> [INSERT SCREENSHOT: POST /auth/register — successful registration response]
-
-> [INSERT SCREENSHOT: POST /auth/login — JWT token response]
-
-> [INSERT SCREENSHOT: GET /users — protected route with Bearer token]
-
----
-
-## 12. Challenges Faced
-
-### PostgreSQL Native Connection Config Issues
-Configuring the new native JavaScript PostgreSQL adapter (`@prisma/adapter-pg`) required injecting the adapter explicitly in the constructor of `PrismaService` instead of utilizing the standard internal Rust connection manager. This was resolved by constructing a pg adapter wrapper that binds to backend lifecycle hooks dynamically.
-
-### Environment Variable Configurations for Prisma CLI
-The Prisma CLI does not natively load `.env` configurations in complex workspace layouts unless directed programmatically. This was mitigated by introducing `prisma.config.ts` loading `dotenv/config` to coordinate file system paths when running migration commands.
-
-### Monorepo Dependency Isolation
-Managing separate packages inside backend and frontend folders could trigger nested git conflicts or dependency leakage. This was prevented by executing strict workspace isolations, ensuring all dependencies are installed locally in their respective root environments.
-
-### Custom Target Client Build Locations
-Using a customized target output path (`output = "../src/generated/prisma"`) for the Prisma Client required configuring custom relative imports throughout all NestJS providers. Resolving these paths was necessary to ensure TypeScript compilation steps completed without error.
-
-### JWT Secret Configuration
-Ensuring the JWT secret was correctly loaded from the `.env` file required configuring `JwtModule.registerAsync()` with `ConfigService` injection rather than a static `register()` call. This prevents the `secretOrPrivateKey must have a value` error when the module initializes before environment variables are resolved.
-
-### DTO Import Corrections
-The `UpdateUserDto` initially imported `PartialType` from `@nestjs/swagger` instead of `@nestjs/mapped-types`, causing a runtime import resolution error. This was corrected by updating the import to use the mapped-types package, which does not require Swagger to be installed.
-
-### Password Security & Response Sanitization
-The initial registration implementation returned the full user object including the hashed password. This was resolved by destructuring the user record and returning only the safe fields, ensuring sensitive data is never exposed through the API response.
+1. Logs in with an account whose role is `ADMIN`.
+2. Views dashboard totals, including user totals.
+3. Manages all users from `/dashboard/users`.
+4. Creates user accounts and assigns roles.
+5. Updates any book.
+6. Deletes books.
+7. Deletes users.
 
 ---
 
-## 13. Conclusion
+## 12. Migrations
 
-- **Completed Work**: The project has successfully established a fully secured, decoupled full-stack workspace. The authentication system is operational with JWT token issuance, bcrypt password hashing, protected routes, input validation, and role-aware user accounts.
-- **Current Project Readiness**: High. The authentication pipeline, database schema, ORM integration, validation layer, and security patterns are all fully operational.
-- **Next Development Phase**:
-  - Implement Book CRUD endpoints (`/books`) with full create, read, update, delete operations.
-  - Add role-based route guards to restrict admin-only actions using the `role` field.
-  - Design the interactive frontend dashboard tables and catalog creation forms.
-  - Connect the React frontend to the backend API using Axios with JWT token management.
-  - Add pagination and search/filter support for the book listing endpoint.
+The project has the following Prisma migrations:
+
+| Migration | Purpose |
+| :--- | :--- |
+| `20260522183432_init` | Initial database setup. |
+| `20260523203415_add_user_role` | Adds the `Role` enum and `role` field to users. |
+| `20260524162329_add_books` | Adds book catalog support. |
+| `20260524162757_add_books` | Follow-up book schema migration. |
+| `20260524162856_add_books` | Follow-up book schema migration. |
+| `20260525090633_update_book_entity` | Removes `available` and `quantity` from books. |
+
+The final active `Book` model contains `title`, `author`, `isbn`, `publishedYear`, `description`, timestamps, and `userId`.
+
+---
+
+## 13. Challenges Faced
+
+### Prisma 7 PostgreSQL Adapter Setup
+
+The project uses Prisma 7 with the native JavaScript PostgreSQL adapter. This required creating `PrismaService` with `PrismaPg` and passing the adapter to the generated Prisma client.
+
+### Custom Prisma Client Output
+
+The Prisma client is generated into:
+
+```text
+backend/src/generated/prisma
+```
+
+This required importing generated client types from the custom output location instead of the default `@prisma/client` runtime path.
+
+### JWT Secret Loading
+
+JWT validation depends on `JWT_SECRET` being available through `ConfigService`. The strategy uses `config.getOrThrow<string>('JWT_SECRET')` to fail fast when the secret is missing.
+
+### Role-Based Permissions
+
+The system evolved from basic JWT protection into role-aware behavior. Books now use owner/admin update rules, admin-only delete rules, and users endpoints restrict list/create/delete operations to admins.
+
+### Frontend Token Persistence
+
+The frontend stores authentication state locally and uses Axios interceptors to attach tokens to every API request. It also clears local auth state after a `401` response to avoid stale sessions.
+
+### Dashboard and Landing Stats
+
+Statistics are calculated from real database records using counts and author grouping. This allows both the landing page and dashboard to reflect current system data.
+
+---
+
+## 14. Current Status and Next Steps
+
+### Completed
+
+- NestJS backend application.
+- PostgreSQL database schema.
+- Prisma migrations and generated client.
+- JWT login flow.
+- Public user registration.
+- bcrypt password hashing.
+- Role enum with `USER` and `ADMIN`.
+- Protected books API.
+- Admin-aware users API.
+- Public and protected statistics API.
+- Swagger documentation at `/api`.
+- React landing page.
+- React auth pages.
+- Protected dashboard routes.
+- Books management UI.
+- Users management UI.
+- Profile editing UI.
+- Axios API layer with token injection.
+
+### Current Implementation Notes
+
+- Public registration creates a `USER` account and returns the safe user object.
+- Login returns both `access_token` and the safe user profile.
+- Logout is stateless and handled by clearing frontend storage.
+- User list/create/delete actions are admin-only on the backend.
+- Book deletion is admin-only on the backend.
+- Book updates are allowed for the book owner or an admin.
+
+### Recommended Next Steps
+
+- Align the registration frontend with the backend response, or update the backend to issue a token on registration.
+- Hide or restrict the users page in the frontend for non-admin users.
+- Add backend authorization checks so users can only update their own profile unless they are admins.
+- Add pagination and server-side search for large book lists.
+- Add automated tests for auth, books, users, and stats.
+- Add seed data for local development and demos.
+- Add deployment documentation for production environments.

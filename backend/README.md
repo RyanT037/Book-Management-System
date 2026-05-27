@@ -76,7 +76,7 @@ Bearer <access_token>
 
 | Method | Endpoint | Auth | Description |
 |---|---|---|---|
-| GET | `/` | Public | Health/welcome message |
+| GET | `/` | Public | App/welcome message |
 
 ### Authentication
 
