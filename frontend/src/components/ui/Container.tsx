@@ -1,5 +1,5 @@
 import type { HTMLAttributes, ReactNode } from 'react';
-import { cn } from '../../lib/cn';
+import { classNameHelper } from '../../lib/classNameHelper';
 
 export interface ContainerProps extends HTMLAttributes<HTMLDivElement> {
   children: ReactNode;
@@ -20,7 +20,7 @@ export function Container({
 }: ContainerProps) {
   return (
     <div
-      className={cn('mx-auto w-full px-4 sm:px-6 lg:px-8', sizeClasses[size], className)}
+      className={classNameHelper('mx-auto w-full px-4 sm:px-6 lg:px-8', sizeClasses[size], className)}
       {...props}
     >
       {children}

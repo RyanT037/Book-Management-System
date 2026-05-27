@@ -1,5 +1,5 @@
 import { forwardRef, type InputHTMLAttributes } from 'react';
-import { cn } from '../../lib/cn';
+import { classNameHelper } from '../../lib/classNameHelper';
 
 export interface CheckboxProps
   extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> {
@@ -19,7 +19,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
           ref={ref}
           id={checkboxId}
           type="checkbox"
-          className={cn(
+          className={classNameHelper(
             'h-4 w-4 rounded border-slate-300 text-brand-600',
             'focus:ring-2 focus:ring-brand-500/30 focus:ring-offset-0',
             className,

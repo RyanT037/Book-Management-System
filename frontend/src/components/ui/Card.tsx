@@ -1,5 +1,5 @@
 import type { HTMLAttributes, ReactNode } from 'react';
-import { cn } from '../../lib/cn';
+import { classNameHelper } from '../../lib/classNameHelper';
 
 export interface CardProps extends HTMLAttributes<HTMLDivElement> {
   children: ReactNode;
@@ -22,7 +22,7 @@ export function Card({
 }: CardProps) {
   return (
     <div
-      className={cn(
+      className={classNameHelper(
         'rounded-2xl bg-white shadow-card',
         paddingClasses[padding],
         hover &&

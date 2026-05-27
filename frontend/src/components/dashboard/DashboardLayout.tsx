@@ -1,6 +1,5 @@
-import type { ReactNode } from 'react';
-import { cn } from '../../lib/cn';
-import { useUiStore } from '../../store/ui.store';
+import { useState, type ReactNode } from 'react';
+import { classNameHelper } from '../../lib/classNameHelper';
 import { DashboardHeader } from './DashboardHeader';
 import { DashboardSidebar } from './DashboardSidebar';
 
@@ -9,7 +8,7 @@ interface DashboardLayoutProps {
 }
 
 export function DashboardLayout({ children }: DashboardLayoutProps) {
-  const { sidebarOpen, setSidebarOpen } = useUiStore();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
     <div className="flex min-h-svh bg-slate-50">
@@ -27,7 +26,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       )}
 
       <div
-        className={cn(
+        className={classNameHelper(
           'fixed inset-y-0 left-0 z-50 transition-transform duration-300 lg:hidden',
           sidebarOpen ? 'translate-x-0' : '-translate-x-full',
         )}
@@ -36,7 +35,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       </div>
 
       <div className="flex min-h-svh flex-1 flex-col lg:pl-64">
-        <DashboardHeader />
+        <DashboardHeader toggleSidebar={() => setSidebarOpen((prev) => !prev)} />
         <main className="flex-1 p-4 sm:p-6 lg:p-8">{children}</main>
       </div>
     </div>

@@ -11,7 +11,7 @@ LandingPage (/)
     ├── PublicNavbar, Hero, Features, About, Stats, Testimonials, CTA, Footer
     │
 Login / Register (/login, /register)
-    ├── AuthLayout + React Hook Form + Zod
+    ├── AuthLayout + React Hook Form built-in validation
     └── (Day 5) useAuthActions → auth.service → Backend
     │
 Dashboard (/dashboard)
@@ -31,9 +31,8 @@ Dashboard (/dashboard)
 | Vite 8 | Dev server and build tool |
 | Tailwind CSS v4 + `@tailwindcss/vite` | All UI styling (utility classes only) |
 | React Router DOM | Client-side routing |
-| React Hook Form + Zod + `@hookform/resolvers` | Form state and validation |
+| React Hook Form | Form state and built-in validation |
 | Axios | HTTP client (auth service) |
-| Zustand | Dashboard mobile sidebar state |
 | React Hot Toast | Notifications |
 | Lucide React | Icons |
 
@@ -124,14 +123,7 @@ Stats and testimonials include `TODO: Connect to backend API on Day 5` in code w
 
 ### Validation
 
-**File:** `src/schemas/auth.schema.ts`
-
-| Schema | Fields |
-|--------|--------|
-| `loginSchema` | email, password, optional rememberMe |
-| `registerSchema` | name, email, password, confirmPassword (with match refine) |
-
-Forms use **React Hook Form** + **Zod** via `zodResolver`.
+Forms use **React Hook Form** with inline validation rules.
 
 ### Login features
 
@@ -171,7 +163,7 @@ Matches the library admin dashboard design language: white sidebar, top header, 
 
 ### State
 
-**File:** `src/store/ui.store.ts` — Zustand store for `sidebarOpen`, `toggleSidebar`, `setSidebarOpen` (mobile drawer).
+Dashboard mobile sidebar state uses simple React `useState` inside `DashboardLayout`.
 
 ### Mock data
 
@@ -283,10 +275,6 @@ src/
 ├── data/
 │   ├── landing.data.ts
 │   └── dashboard.data.ts
-├── schemas/
-│   └── auth.schema.ts
-├── store/
-│   └── ui.store.ts
 ├── context/
 │   └── AuthContext.tsx
 ├── hooks/
@@ -341,7 +329,7 @@ src/
 ## Day 5 Integration Checklist
 
 - [ ] Wire `Login` / `Register` submit to `useAuthActions()`
-- [ ] Align `registerSchema` with backend DTO (e.g. add `username` if required)
+- [ ] Keep register form fields aligned with the backend DTO
 - [ ] Replace mock stats in `landing.data.ts` and `dashboard.data.ts` with API calls
 - [ ] Add protected routes for `/dashboard` and admin pages
 - [ ] Attach JWT from `AuthContext` to book and library API requests

@@ -1,21 +1,39 @@
 import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class RegisterDto {
-    @IsEmail()
-    @IsNotEmpty()
-    email!: string;
+  @ApiProperty({
+    description: 'User email address',
+    example: 'reader@example.com',
+  })
+  @IsEmail()
+  @IsNotEmpty()
+  email!: string;
 
-    @IsNotEmpty()
-    @MinLength(6)
-    password!: string;
+  @ApiProperty({
+    description: 'User password. Must be at least 6 characters.',
+    example: 'password123',
+    minLength: 6,
+  })
+  @IsNotEmpty()
+  @MinLength(6)
+  password!: string;
 
-    @IsString()
-    @IsNotEmpty()
-    name!: string;
+  @ApiProperty({
+    description: 'Full name of the user',
+    example: 'Jane Reader',
+  })
+  @IsString()
+  @IsNotEmpty()
+  name!: string;
 
-    @IsString()
-    @IsNotEmpty()
-    username!: string;
-    
-    // Role cannot be set during public registration - it defaults to USER on the server
+  @ApiProperty({
+    description: 'Unique username for the user',
+    example: 'janereader',
+  })
+  @IsString()
+  @IsNotEmpty()
+  username!: string;
+
+  // Role cannot be set during public registration - it defaults to USER on the server
 }

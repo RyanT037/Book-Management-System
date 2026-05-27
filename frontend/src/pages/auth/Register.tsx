@@ -1,4 +1,3 @@
-import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link } from 'react-router-dom';
@@ -7,10 +6,14 @@ import { AuthLayout } from '../../components/auth/AuthLayout';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { useAuthActions } from '../../hooks/useAuthActions';
-import {
-  registerSchema,
-  type RegisterFormValues,
-} from '../../schemas/auth.schema';
+
+type RegisterFormValues = {
+  name: string;
+  username: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+};
 
 export default function Register() {
   const [isLoading, setIsLoading] = useState(false);
@@ -19,10 +22,9 @@ export default function Register() {
   const {
     register,
     handleSubmit,
+    getValues,
     formState: { errors },
-  } = useForm<RegisterFormValues>({
-    resolver: zodResolver(registerSchema),
-  });
+  } = useForm<RegisterFormValues>();
 
   const onSubmit = async (data: RegisterFormValues) => {
     setIsLoading(true);
@@ -47,7 +49,13 @@ export default function Register() {
           autoComplete="name"
           placeholder="Jane Librarian"
           error={errors.name?.message}
-          {...register('name')}
+          {...register('name', {
+            required: 'Name is required',
+            minLength: {
+              value: 2,
+              message: 'Name must be at least 2 characters',
+            },
+          })}
         />
 
         <Input
@@ -56,7 +64,13 @@ export default function Register() {
           autoComplete="username"
           placeholder="janedoe"
           error={errors.username?.message}
-          {...register('username')}
+          {...register('username', {
+            required: 'Username is required',
+            minLength: {
+              value: 3,
+              message: 'Username must be at least 3 characters',
+            },
+          })}
         />
 
         <Input
@@ -65,7 +79,13 @@ export default function Register() {
           autoComplete="email"
           placeholder="you@library.com"
           error={errors.email?.message}
-          {...register('email')}
+          {...register('email', {
+            required: 'Email is required',
+            pattern: {
+              value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+              message: 'Enter a valid email address',
+            },
+          })}
         />
 
         <Input
@@ -74,7 +94,13 @@ export default function Register() {
           autoComplete="new-password"
           placeholder="At least 6 characters"
           error={errors.password?.message}
-          {...register('password')}
+          {...register('password', {
+            required: 'Password is required',
+            minLength: {
+              value: 6,
+              message: 'Password must be at least 6 characters',
+            },
+          })}
         />
 
         <Input
@@ -83,7 +109,11 @@ export default function Register() {
           autoComplete="new-password"
           placeholder="Re-enter your password"
           error={errors.confirmPassword?.message}
-          {...register('confirmPassword')}
+          {...register('confirmPassword', {
+            required: 'Please confirm your password',
+            validate: (value) =>
+              value === getValues('password') || 'Passwords do not match',
+          })}
         />
 
         <Button type="submit" fullWidth size="lg" disabled={isLoading}>

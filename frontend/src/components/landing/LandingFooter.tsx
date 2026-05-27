@@ -28,8 +28,8 @@ export function LandingFooter() {
               <span className="text-lg font-bold">Library System</span>
             </Link>
             <p className="mt-4 max-w-xs text-sm text-slate-500">
-              Online Library Management System — modern tools for catalogs,
-              members, and borrowing.
+              Online Library Management System — modern tools for catalogs and
+              members.
             </p>
           </div>
 

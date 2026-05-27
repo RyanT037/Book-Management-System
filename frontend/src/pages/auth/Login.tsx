@@ -1,4 +1,3 @@
-import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link } from 'react-router-dom';
@@ -7,7 +6,11 @@ import { AuthLayout } from '../../components/auth/AuthLayout';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { useAuthActions } from '../../hooks/useAuthActions';
-import { loginSchema, type LoginFormValues } from '../../schemas/auth.schema';
+
+type LoginFormValues = {
+  email: string;
+  password: string;
+};
 
 export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
@@ -17,9 +20,7 @@ export default function Login() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<LoginFormValues>({
-    resolver: zodResolver(loginSchema),
-  });
+  } = useForm<LoginFormValues>();
 
   const onSubmit = async (data: LoginFormValues) => {
     setIsLoading(true);
@@ -44,7 +45,13 @@ export default function Login() {
           autoComplete="email"
           placeholder="you@library.com"
           error={errors.email?.message}
-          {...register('email')}
+          {...register('email', {
+            required: 'Email is required',
+            pattern: {
+              value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+              message: 'Enter a valid email address',
+            },
+          })}
         />
 
         <Input
@@ -53,7 +60,13 @@ export default function Login() {
           autoComplete="current-password"
           placeholder="Enter your password"
           error={errors.password?.message}
-          {...register('password')}
+          {...register('password', {
+            required: 'Password is required',
+            minLength: {
+              value: 6,
+              message: 'Password must be at least 6 characters',
+            },
+          })}
         />
 
         <Button type="submit" fullWidth size="lg" disabled={isLoading}>

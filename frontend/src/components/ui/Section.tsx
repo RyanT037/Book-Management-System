@@ -1,5 +1,5 @@
 import type { HTMLAttributes, ReactNode } from 'react';
-import { cn } from '../../lib/cn';
+import { classNameHelper } from '../../lib/classNameHelper';
 import { Container } from './Container';
 
 export interface SectionProps extends HTMLAttributes<HTMLElement> {
@@ -27,7 +27,7 @@ export function Section({
   return (
     <section
       id={id}
-      className={cn('py-16 md:py-24', backgroundClasses[background], className)}
+      className={classNameHelper('py-16 md:py-24', backgroundClasses[background], className)}
       {...props}
     >
       <Container size={containerSize}>{children}</Container>

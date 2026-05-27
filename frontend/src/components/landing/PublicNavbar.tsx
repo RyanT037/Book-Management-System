@@ -3,7 +3,7 @@ import { Library, Menu, X } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '../ui/Button';
 import { Container } from '../ui/Container';
-import { cn } from '../../lib/cn';
+import { classNameHelper } from '../../lib/classNameHelper';
 
 const navLinks = [
   { label: 'Features', href: '#features' },
@@ -67,7 +67,7 @@ export function PublicNavbar() {
         </div>
 
         <div
-          className={cn(
+          className={classNameHelper(
             'overflow-hidden border-t border-slate-100 transition-all md:hidden',
             mobileOpen ? 'max-h-96 pb-4' : 'max-h-0 border-transparent',
           )}

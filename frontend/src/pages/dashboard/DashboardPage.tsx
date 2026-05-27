@@ -5,7 +5,12 @@ import { DashboardLayout } from '../../components/dashboard/DashboardLayout';
 import { StatCard } from '../../components/dashboard/StatCard';
 import { useAuth } from '../../context/AuthContext';
 import { statsService } from '../../services/stats.service';
-import type { DashboardStat } from '../../data/dashboard.data';
+
+interface DashboardStat {
+  label: string;
+  value: string;
+  colorClass: string;
+}
 
 const placeholderStats: DashboardStat[] = [
   { label: 'Total Books', value: '...', colorClass: 'bg-stat-purple' },

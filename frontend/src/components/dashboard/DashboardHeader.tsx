@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Menu, User } from 'lucide-react';
-import { useUiStore } from '../../store/ui.store';
 import { useAuthActions } from '../../hooks/useAuthActions';
 
-export function DashboardHeader() {
-  const toggleSidebar = useUiStore((s) => s.toggleSidebar);
+interface DashboardHeaderProps {
+  toggleSidebar: () => void;
+}
+
+export function DashboardHeader({ toggleSidebar }: DashboardHeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { logout } = useAuthActions();
 
@@ -61,9 +63,7 @@ export function DashboardHeader() {
                 <span>Logout</span>
               </button>
             </div>
-            <div className="border-t border-slate-100 px-3 py-2 text-xs text-slate-400">
-              {/* Day five: wire up actual profile navigation and logout handling here */}
-            </div>
+
           </div>
         )}
       </div>

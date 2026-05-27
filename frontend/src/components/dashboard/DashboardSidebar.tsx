@@ -1,33 +1,22 @@
 import { NavLink } from 'react-router-dom';
-import {
-  BookOpen,
-  ChevronRight,
-  FileText,
-  FolderTree,
-  LayoutDashboard,
-  Library,
-  LogOut,
-  Search,
-  Settings,
-  UserPen,
-  Users,
-} from 'lucide-react';
+import { BookOpen, LayoutDashboard, Library, LogOut, UserPen, Users } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useAuthActions } from '../../hooks/useAuthActions';
 import { useAuth } from '../../context/AuthContext';
-import { cn } from '../../lib/cn';
-import { sidebarNavItems } from '../../data/dashboard.data';
+import { classNameHelper } from '../../lib/classNameHelper';
+
+const sidebarNavItems = [
+  { label: 'Dashboard', path: '/dashboard' },
+  { label: 'Books', path: '/dashboard/books' },
+  { label: 'Users', path: '/dashboard/users' },
+  { label: 'Profile', path: '/dashboard/profile' },
+];
 
 const iconMap: Record<string, LucideIcon> = {
   Dashboard: LayoutDashboard,
-  Category: FolderTree,
-  Author: UserPen,
   Books: BookOpen,
-  Member: Users,
-  Borrow: Library,
-  Search: Search,
-  Report: FileText,
-  Settings: Settings,
+  Users: Users,
+  Profile: UserPen,
 };
 
 interface DashboardSidebarProps {
@@ -41,7 +30,7 @@ export function DashboardSidebar({ className, onNavigate }: DashboardSidebarProp
 
   return (
     <aside
-      className={cn(
+      className={classNameHelper(
         'flex h-full w-64 shrink-0 flex-col border-r border-slate-200 bg-white',
         className,
       )}
@@ -65,7 +54,7 @@ export function DashboardSidebar({ className, onNavigate }: DashboardSidebarProp
               onClick={onNavigate}
               end={item.path === '/dashboard'}
               className={({ isActive }) =>
-                cn(
+                classNameHelper(
                   'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200',
                   isActive
                     ? 'bg-brand-600 text-white shadow-sm'
@@ -75,9 +64,6 @@ export function DashboardSidebar({ className, onNavigate }: DashboardSidebarProp
             >
               <Icon className="h-4 w-4 shrink-0" strokeWidth={1.75} />
               <span className="flex-1">{item.label}</span>
-              {item.hasSubmenu && (
-                <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" />
-              )}
             </NavLink>
           );
         })}
@@ -95,9 +81,6 @@ export function DashboardSidebar({ className, onNavigate }: DashboardSidebarProp
           <LogOut className="h-4 w-4" />
           <span>Logout</span>
         </button>
-        <p className="mt-2 text-xs text-slate-400">
-          {/* Day five: add sidebar logout functionality here */}
-        </p>
       </div>
     </aside>
   );

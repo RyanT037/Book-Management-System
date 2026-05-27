@@ -11,10 +11,7 @@ export function initializeApiInterceptors(logout: () => void) {
     (config: InternalAxiosRequestConfig) => {
       const token = localStorage.getItem(TOKEN_KEY);
       if (token) {
-        if (!config.headers) {
-          config.headers = {};
-        }
-        config.headers.Authorization = `Bearer ${token}`;
+        config.headers.set('Authorization', `Bearer ${token}`);
       }
       return config;
     },

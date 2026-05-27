@@ -82,27 +82,27 @@ export const aboutStats = [
 
 export const testimonials: TestimonialItem[] = [
   {
-    name: 'Sarah Mitchell',
-    role: 'Head Librarian, Riverside Public',
+    name: 'Ryan Tsele',
+    role: 'Head Librarian, FairView Public Library',
     quote:
-      'Our team finally has one place to manage books, members, and borrowing. The dashboard is intuitive and our staff adopted it within days.',
-    initials: 'SM',
+      'Our team finally has one place to manage books and members. The dashboard is intuitive and our staff adopted it within days.',
+    initials: 'RT',
     accentClass: 'bg-brand-600',
   },
   {
-    name: 'James Okonkwo',
+    name: 'Allan Chizanga',
     role: 'IT Administrator, Metro University',
     quote:
       'Clean design, fast workflows, and a structure that scales. It feels like a professional SaaS product built specifically for libraries.',
-    initials: 'JO',
+    initials: 'AC',
     accentClass: 'bg-stat-purple',
   },
   {
-    name: 'Elena Vasquez',
+    name: 'Craig Tsele',
     role: 'Operations Manager, City Archives',
     quote:
       'Digitizing our library operations reduced manual errors and gave leadership real visibility into usage and inventory trends.',
-    initials: 'EV',
+    initials: 'CT',
     accentClass: 'bg-stat-coral',
   },
 ];

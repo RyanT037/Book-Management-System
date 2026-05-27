@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
 import { Button } from '../../components/ui/Button';
@@ -7,20 +6,14 @@ import { Input } from '../../components/ui/Input';
 import { DashboardLayout } from '../../components/dashboard/DashboardLayout';
 import { Edit2, Plus, Search, Trash2, X } from 'lucide-react';
 import { bookService, type Book, type CreateBookPayload } from '../../services/book.service';
-import { z } from 'zod';
 
-const bookFormSchema = z.object({
-  title: z.string().min(1, 'Title is required'),
-  author: z.string().min(1, 'Author is required'),
-  isbn: z.string().min(1, 'ISBN is required'),
-  publishedYear: z.coerce
-    .number({ invalid_type_error: 'Published year is required' })
-    .int('Published year must be a whole number')
-    .min(1000, 'Enter a valid year'),
-  description: z.string().min(1, 'Description is required'),
-});
-
-type BookFormValues = z.infer<typeof bookFormSchema>;
+type BookFormValues = {
+  title: string;
+  author: string;
+  isbn: string;
+  publishedYear: number;
+  description: string;
+};
 
 export default function BooksPage() {
   const [books, setBooks] = useState<Book[]>([]);
@@ -33,7 +26,6 @@ export default function BooksPage() {
   const [error, setError] = useState<string | null>(null);
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm<BookFormValues>({
-    resolver: zodResolver(bookFormSchema),
     defaultValues: {
       title: '',
       author: '',
@@ -286,28 +278,44 @@ export default function BooksPage() {
                 type="text"
                 placeholder="Enter book title"
                 error={errors.title?.message}
-                {...register('title')}
+                {...register('title', {
+                  required: 'Title is required',
+                })}
               />
               <Input
                 label="Author"
                 type="text"
                 placeholder="Enter author name"
                 error={errors.author?.message}
-                {...register('author')}
+                {...register('author', {
+                  required: 'Author is required',
+                })}
               />
               <Input
                 label="ISBN"
                 type="text"
                 placeholder="123-4567890123"
                 error={errors.isbn?.message}
-                {...register('isbn')}
+                {...register('isbn', {
+                  required: 'ISBN is required',
+                })}
               />
               <Input
                 label="Published year"
                 type="number"
                 placeholder="2024"
                 error={errors.publishedYear?.message}
-                {...register('publishedYear', { valueAsNumber: true })}
+                {...register('publishedYear', {
+                  required: 'Published year is required',
+                  valueAsNumber: true,
+                  min: {
+                    value: 1000,
+                    message: 'Enter a valid year',
+                  },
+                  validate: (value) =>
+                    (!Number.isNaN(value) && Number.isInteger(value)) ||
+                    'Published year must be a whole number',
+                })}
               />
               <div className="md:col-span-2">
                 <label className="mb-2 block text-sm font-medium text-slate-700" htmlFor="description">
@@ -315,7 +323,9 @@ export default function BooksPage() {
                 </label>
                 <textarea
                   id="description"
-                  {...register('description')}
+                  {...register('description', {
+                    required: 'Description is required',
+                  })}
                   placeholder="Write a short description of the book"
                   className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500/30"
                   rows={4}
