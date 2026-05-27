@@ -12,12 +12,13 @@ const benefits = [
 
 export function AboutSection() {
   const [stats, setStats] = useState([
-    { label: 'Total Users', value: '...' },
-    { label: 'Total Books', value: '...' },
-    { label: 'Total Authors', value: '...' },
+    { label: 'Total Users', value: '0' },
+    { label: 'Total Books', value: '0' },
+    { label: 'Total Authors', value: '0' },
   ]);
 
   useEffect(() => {
+    // Fetch real-time public statistics from the backend service
     statsService
       .getPublicStats()
       .then((data) => {
@@ -28,10 +29,11 @@ export function AboutSection() {
         ]);
       })
       .catch(() => {
+        // Reset to zero if the API call fails
         setStats([
-          { label: 'Total Users', value: 'N/A' },
-          { label: 'Total Books', value: 'N/A' },
-          { label: 'Total Authors', value: 'N/A' },
+          { label: 'Total Users', value: '0' },
+          { label: 'Total Books', value: '0' },
+          { label: 'Total Authors', value: '0' },
         ]);
       });
   }, []);

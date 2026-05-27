@@ -7,12 +7,14 @@ import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { useAuthActions } from '../../hooks/useAuthActions';
 
+// Define the shape of the login form data
 type LoginFormValues = {
   email: string;
   password: string;
 };
 
 export default function Login() {
+  // Local state to manage the loading status during form submission
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuthActions();
 
@@ -22,6 +24,7 @@ export default function Login() {
     formState: { errors },
   } = useForm<LoginFormValues>();
 
+  // Handle form submission by calling the login action from the auth hook
   const onSubmit = async (data: LoginFormValues) => {
     setIsLoading(true);
     try {
@@ -39,6 +42,7 @@ export default function Login() {
       subtitle="Sign in to access your library dashboard."
     >
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
+        {/* Email Input Field with validation */}
         <Input
           label="Email"
           type="email"
@@ -54,6 +58,7 @@ export default function Login() {
           })}
         />
 
+        {/* Password Input Field with validation */}
         <Input
           label="Password"
           type="password"
@@ -69,10 +74,12 @@ export default function Login() {
           })}
         />
 
+        {/* Submit Button with loading state */}
         <Button type="submit" fullWidth size="lg" disabled={isLoading}>
           {isLoading ? 'Signing in…' : 'Sign in'}
         </Button>
 
+        {/* Navigation link to the registration page */}
         <p className="text-center text-sm text-slate-600">
           Don&apos;t have an account?{' '}
           <Link

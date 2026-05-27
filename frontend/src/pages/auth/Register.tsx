@@ -7,6 +7,7 @@ import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { useAuthActions } from '../../hooks/useAuthActions';
 
+// Define the shape of the registration form data
 type RegisterFormValues = {
   name: string;
   username: string;
@@ -16,6 +17,7 @@ type RegisterFormValues = {
 };
 
 export default function Register() {
+  // Local state to manage the loading status during form submission
   const [isLoading, setIsLoading] = useState(false);
   const { register: registerAction } = useAuthActions();
 
@@ -26,6 +28,7 @@ export default function Register() {
     formState: { errors },
   } = useForm<RegisterFormValues>();
 
+  // Handle form submission by calling the register action from the auth hook
   const onSubmit = async (data: RegisterFormValues) => {
     setIsLoading(true);
     try {
@@ -43,6 +46,7 @@ export default function Register() {
       subtitle="Join the platform and start managing your library."
     >
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
+        {/* Full Name Input Field with validation */}
         <Input
           label="Full name"
           type="text"
@@ -58,6 +62,7 @@ export default function Register() {
           })}
         />
 
+        {/* Username Input Field with validation */}
         <Input
           label="Username"
           type="text"
@@ -73,6 +78,7 @@ export default function Register() {
           })}
         />
 
+        {/* Email Input Field with validation */}
         <Input
           label="Email"
           type="email"
@@ -88,6 +94,7 @@ export default function Register() {
           })}
         />
 
+        {/* Password Input Field with validation */}
         <Input
           label="Password"
           type="password"
@@ -103,6 +110,7 @@ export default function Register() {
           })}
         />
 
+        {/* Confirm Password Input Field with matching validation */}
         <Input
           label="Confirm password"
           type="password"
@@ -116,10 +124,12 @@ export default function Register() {
           })}
         />
 
+        {/* Submit Button with loading state */}
         <Button type="submit" fullWidth size="lg" disabled={isLoading}>
           {isLoading ? 'Creating account…' : 'Create account'}
         </Button>
 
+        {/* Navigation link to the login page */}
         <p className="text-center text-sm text-slate-600">
           Already have an account?{' '}
           <Link

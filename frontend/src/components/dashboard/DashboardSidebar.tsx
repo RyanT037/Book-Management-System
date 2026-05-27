@@ -12,6 +12,7 @@ const sidebarNavItems = [
   { label: 'Profile', path: '/dashboard/profile' },
 ];
 
+// Map navigation labels to their respective Lucide icons
 const iconMap: Record<string, LucideIcon> = {
   Dashboard: LayoutDashboard,
   Books: BookOpen,

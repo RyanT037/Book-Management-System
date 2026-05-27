@@ -7,7 +7,9 @@ export function CtaSection() {
   return (
     <section className="py-16 md:py-20">
       <Container>
+        {/* Main CTA card with gradient background and rounded corners */}
         <div className="relative overflow-hidden rounded-3xl bg-gradient-cta px-8 py-14 text-center text-white shadow-card-hover sm:px-12">
+          {/* Decorative background blur elements */}
           <div
             aria-hidden
             className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-white/10 blur-2xl"

@@ -12,6 +12,7 @@ interface FormData {
   password: string;
 }
 
+// ProfilePage allows users to view their account details and update their personal information.
 export default function ProfilePage() {
   const { user, updateUser, isLoading: authLoading } = useAuth();
   const [formData, setFormData] = useState<FormData>({
@@ -24,7 +25,7 @@ export default function ProfilePage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  // Sync form data with user
+  // Sync local form state with the authenticated user data from context whenever it changes.
   useEffect(() => {
     if (user) {
       setFormData({
@@ -36,7 +37,7 @@ export default function ProfilePage() {
     }
   }, [user]);
 
-  // Show loading state while auth is initializing
+  // Show a skeleton or loading state while the authentication status is being determined.
   if (authLoading) {
     return (
       <DashboardLayout>
@@ -48,6 +49,7 @@ export default function ProfilePage() {
     );
   }
 
+  // Fallback UI if the user is not authenticated.
   if (!user) {
     return (
       <DashboardLayout>
@@ -59,6 +61,7 @@ export default function ProfilePage() {
     );
   }
 
+  // Update local state as the user types in the form fields.
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -69,6 +72,7 @@ export default function ProfilePage() {
     setSuccess(false);
   };
 
+  // Revert form changes to the original user data.
   const handleCancel = () => {
     setFormData({
       name: user.name,
@@ -80,6 +84,7 @@ export default function ProfilePage() {
     setSuccess(false);
   };
 
+  // Submit the updated profile data to the backend and update the global auth context.
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
@@ -93,10 +98,12 @@ export default function ProfilePage() {
         email: formData.email,
       };
 
+      // Only include the password in the payload if the user actually typed a new one.
       if (formData.password) {
         updatePayload.password = formData.password;
       }
 
+      // Call the user service to persist changes and then update the local context.
       const updatedUser = await userService.update(user.id, updatePayload);
       updateUser(updatedUser);
       setSuccess(true);
@@ -105,6 +112,7 @@ export default function ProfilePage() {
         password: '',
       }));
 
+      // Clear the success message after a short delay.
       setTimeout(() => {
         setSuccess(false);
       }, 3000);
@@ -115,6 +123,7 @@ export default function ProfilePage() {
     }
   };
 
+  // Helper to generate a two-letter avatar placeholder from the user's name.
   const getInitials = (name: string) => {
     return name
       .split(' ')
@@ -124,6 +133,7 @@ export default function ProfilePage() {
       .slice(0, 2);
   };
 
+  // Format the creation date for a cleaner display (e.g., "January 2024").
   const formattedDate = new Date(user.createdAt).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
@@ -139,6 +149,7 @@ export default function ProfilePage() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[360px_1fr]">
+        {/* Read-only Profile Overview Card */}
         <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
           <div className="flex items-center gap-4">
             <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-600 text-white">
@@ -166,6 +177,7 @@ export default function ProfilePage() {
           </div>
         </section>
 
+        {/* Editable Profile Form Card */}
         <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
           <div className="flex items-center justify-between gap-4">
             <div>

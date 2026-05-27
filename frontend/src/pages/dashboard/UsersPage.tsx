@@ -14,6 +14,7 @@ export default function UsersPage() {
   const [deleteUser, setDeleteUser] = useState<User | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
 
+  // Fetch the list of users from the backend on component mount
   useEffect(() => {
     let active = true;
 
@@ -39,6 +40,7 @@ export default function UsersPage() {
     };
   }, []);
 
+  // Reset all modal states and clear form errors
   const closeModals = () => {
     setIsAddOpen(false);
     setEditingUser(null);
@@ -46,6 +48,7 @@ export default function UsersPage() {
     setFormError(null);
   };
 
+  // Handle the creation of a new user account
   const handleAddUser = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setFormError(null);
@@ -75,6 +78,7 @@ export default function UsersPage() {
     }
   };
 
+  // Handle updating an existing user's information
   const handleEditUser = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!editingUser) return;
@@ -111,6 +115,7 @@ export default function UsersPage() {
     }
   };
 
+  // Handle the deletion of a user account
   const handleDeleteUser = async () => {
     if (!deleteUser) return;
 
@@ -129,6 +134,7 @@ export default function UsersPage() {
 
   return (
     <DashboardLayout>
+      {/* Page Header */}
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Users</h1>
@@ -143,6 +149,7 @@ export default function UsersPage() {
         </Button>
       </div>
 
+      {/* Users Table */}
       <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
         <table className="min-w-full divide-y divide-slate-200">
           <thead className="bg-slate-50">
@@ -208,6 +215,7 @@ export default function UsersPage() {
         </table>
       </div>
 
+      {/* Add/Edit User Modal */}
       {(isAddOpen || editingUser) && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4">
           <div className="w-full max-w-3xl overflow-hidden rounded-3xl bg-white p-6 shadow-2xl">
@@ -218,8 +226,8 @@ export default function UsersPage() {
                 </h2>
                 <p className="mt-1 text-sm text-slate-500">
                   {editingUser
-                    ? 'Update the selected user profile. Connect this form to the backend on Day 5.'
-                    : 'Add a new user. This form is UI-only until API integration.'}
+                    ? 'Update the selected user profile details.'
+                    : 'Add a new user to the system.'}
                 </p>
               </div>
               <button
@@ -294,6 +302,7 @@ export default function UsersPage() {
         </div>
       )}
 
+      {/* Delete Confirmation Modal */}
       {deleteUser && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4">
           <div className="w-full max-w-lg overflow-hidden rounded-3xl bg-white p-6 shadow-2xl">

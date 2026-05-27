@@ -13,6 +13,7 @@ const navLinks = [
 ];
 
 export function PublicNavbar() {
+  // State to manage mobile navigation menu visibility
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
   const isLanding = location.pathname === '/';

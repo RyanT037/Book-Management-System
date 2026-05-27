@@ -1,11 +1,15 @@
-import { useEffect, useMemo, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { toast } from 'react-hot-toast';
-import { Button } from '../../components/ui/Button';
-import { Input } from '../../components/ui/Input';
-import { DashboardLayout } from '../../components/dashboard/DashboardLayout';
-import { Edit2, Plus, Search, Trash2, X } from 'lucide-react';
-import { bookService, type Book, type CreateBookPayload } from '../../services/book.service';
+import { useEffect, useMemo, useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "react-hot-toast";
+import { Button } from "../../components/ui/Button";
+import { Input } from "../../components/ui/Input";
+import { DashboardLayout } from "../../components/dashboard/DashboardLayout";
+import { Edit2, Plus, Search, Trash2, X } from "lucide-react";
+import {
+  bookService,
+  type Book,
+  type CreateBookPayload,
+} from "../../services/book.service";
 
 type BookFormValues = {
   title: string;
@@ -17,7 +21,7 @@ type BookFormValues = {
 
 export default function BooksPage() {
   const [books, setBooks] = useState<Book[]>([]);
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState("");
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [editingBook, setEditingBook] = useState<Book | null>(null);
   const [deleteBook, setDeleteBook] = useState<Book | null>(null);
@@ -25,17 +29,24 @@ export default function BooksPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<BookFormValues>({
+  // Initialize react-hook-form for book data management
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<BookFormValues>({
     defaultValues: {
-      title: '',
-      author: '',
-      isbn: '',
+      title: "",
+      author: "",
+      isbn: "",
       publishedYear: 2024,
-      description: '',
+      description: "",
     },
   });
 
   useEffect(() => {
+    // Load the catalog once when the dashboard page opens.
     async function loadBooks() {
       setIsLoading(true);
       setError(null);
@@ -44,7 +55,7 @@ export default function BooksPage() {
         const data = await bookService.list();
         setBooks(data);
       } catch (err) {
-        setError('Failed to load books. Please try again later.');
+        setError("Failed to load books. Please try again later.");
       } finally {
         setIsLoading(false);
       }
@@ -54,28 +65,31 @@ export default function BooksPage() {
   }, []);
 
   const filteredBooks = useMemo(() => {
+    // Search across the visible text fields without mutating the source list.
     const searchTerm = search.trim().toLowerCase();
     return books.filter((book) =>
       [book.title, book.author, book.isbn, book.description]
-        .join(' ')
+        .join(" ")
         .toLowerCase()
         .includes(searchTerm),
     );
   }, [books, search]);
 
   const openAddBook = () => {
+    // Reset the form so stale edit data cannot leak into a new book entry.
     setIsAddModalOpen(true);
     setEditingBook(null);
     reset({
-      title: '',
-      author: '',
-      isbn: '',
+      title: "",
+      author: "",
+      isbn: "",
       publishedYear: new Date().getFullYear(),
-      description: '',
+      description: "",
     });
   };
 
   const openEditBook = (book: Book) => {
+    // Seed the form with the selected book for a predictable edit experience.
     setIsAddModalOpen(true);
     setEditingBook(book);
     reset({
@@ -88,6 +102,7 @@ export default function BooksPage() {
   };
 
   const closeModals = () => {
+    // One close helper keeps modal state transitions consistent.
     setIsAddModalOpen(false);
     setEditingBook(null);
     setDeleteBook(null);
@@ -98,6 +113,7 @@ export default function BooksPage() {
     setError(null);
 
     try {
+      // Shape form values into the API payload expected by the backend DTO.
       const payload: CreateBookPayload = {
         title: data.title,
         author: data.author,
@@ -107,10 +123,10 @@ export default function BooksPage() {
       };
       const newBook = await bookService.create(payload);
       setBooks((current) => [newBook, ...current]);
-      toast.success('Book created successfully');
+      toast.success("Book created successfully");
       closeModals();
     } catch (err) {
-      setError('Unable to add book. Please check your input and try again.');
+      setError("Unable to add book. Please check your input and try again.");
     } finally {
       setIsSaving(false);
     }
@@ -130,13 +146,16 @@ export default function BooksPage() {
         publishedYear: data.publishedYear,
         description: data.description,
       });
+      // Replace only the edited item so the current table order is preserved.
       setBooks((current) =>
-        current.map((book) => (book.id === updatedBook.id ? updatedBook : book)),
+        current.map((book) =>
+          book.id === updatedBook.id ? updatedBook : book,
+        ),
       );
-      toast.success('Book updated successfully');
+      toast.success("Book updated successfully");
       closeModals();
     } catch (err) {
-      setError('Unable to update book. Please try again.');
+      setError("Unable to update book. Please try again.");
     } finally {
       setIsSaving(false);
     }
@@ -149,11 +168,14 @@ export default function BooksPage() {
 
     try {
       await bookService.remove(deleteBook.id);
-      setBooks((current) => current.filter((book) => book.id !== deleteBook.id));
-      toast.success('Book deleted successfully');
+      // Remove the deleted row after the API confirms success.
+      setBooks((current) =>
+        current.filter((book) => book.id !== deleteBook.id),
+      );
+      toast.success("Book deleted successfully");
       closeModals();
     } catch (err) {
-      setError('Unable to delete book. Please try again.');
+      setError("Unable to delete book. Please try again.");
     } finally {
       setIsSaving(false);
     }
@@ -161,6 +183,7 @@ export default function BooksPage() {
 
   return (
     <DashboardLayout>
+      {/* Page Header and Search/Add Actions */}
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Books</h1>
@@ -187,27 +210,42 @@ export default function BooksPage() {
         </div>
       </div>
 
+      {/* Global Error Message Display */}
       {error && (
         <div className="mb-4 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
           {error}
         </div>
       )}
 
+      {/* Books Data Table */}
       <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
         <table className="min-w-full divide-y divide-slate-200">
           <thead className="bg-slate-50">
             <tr>
-              <th className="px-5 py-4 text-left text-sm font-semibold text-slate-700">Title</th>
-              <th className="px-5 py-4 text-left text-sm font-semibold text-slate-700">Author</th>
-              <th className="px-5 py-4 text-left text-sm font-semibold text-slate-700">ISBN</th>
-              <th className="px-5 py-4 text-left text-sm font-semibold text-slate-700">Year</th>
-              <th className="px-5 py-4 text-left text-sm font-semibold text-slate-700">Actions</th>
+              <th className="px-5 py-4 text-left text-sm font-semibold text-slate-700">
+                Title
+              </th>
+              <th className="px-5 py-4 text-left text-sm font-semibold text-slate-700">
+                Author
+              </th>
+              <th className="px-5 py-4 text-left text-sm font-semibold text-slate-700">
+                ISBN
+              </th>
+              <th className="px-5 py-4 text-left text-sm font-semibold text-slate-700">
+                Year
+              </th>
+              <th className="px-5 py-4 text-left text-sm font-semibold text-slate-700">
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-200 bg-white">
             {isLoading ? (
               <tr>
-                <td colSpan={5} className="px-5 py-10 text-center text-sm text-slate-500">
+                <td
+                  colSpan={5}
+                  className="px-5 py-10 text-center text-sm text-slate-500"
+                >
                   Loading books...
                 </td>
               </tr>
@@ -215,19 +253,37 @@ export default function BooksPage() {
               filteredBooks.map((book) => (
                 <tr key={book.id}>
                   <td className="px-5 py-4 text-sm text-slate-700">
-                    <div className="font-medium text-slate-900">{book.title}</div>
-                    <div className="mt-1 text-xs text-slate-500">{book.description}</div>
+                    <div className="font-medium text-slate-900">
+                      {book.title}
+                    </div>
+                    <div className="mt-1 text-xs text-slate-500">
+                      {book.description}
+                    </div>
                   </td>
-                  <td className="px-5 py-4 text-sm text-slate-700">{book.author}</td>
-                  <td className="px-5 py-4 text-sm text-slate-700">{book.isbn}</td>
-                  <td className="px-5 py-4 text-sm text-slate-700">{book.publishedYear}</td>
+                  <td className="px-5 py-4 text-sm text-slate-700">
+                    {book.author}
+                  </td>
+                  <td className="px-5 py-4 text-sm text-slate-700">
+                    {book.isbn}
+                  </td>
+                  <td className="px-5 py-4 text-sm text-slate-700">
+                    {book.publishedYear}
+                  </td>
                   <td className="px-5 py-4 text-sm text-slate-700">
                     <div className="flex flex-wrap gap-2">
-                      <Button variant="secondary" size="sm" onClick={() => openEditBook(book)}>
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => openEditBook(book)}
+                      >
                         <Edit2 className="h-3.5 w-3.5" />
                         Edit
                       </Button>
-                      <Button variant="outline" size="sm" onClick={() => setDeleteBook(book)}>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setDeleteBook(book)}
+                      >
                         <Trash2 className="h-3.5 w-3.5" />
                         Delete
                       </Button>
@@ -237,8 +293,13 @@ export default function BooksPage() {
               ))
             ) : (
               <tr>
-                <td colSpan={5} className="px-5 py-10 text-center text-sm text-slate-500">
-                  {books.length === 0 ? 'No books found. Add your first book to get started.' : 'No books match the current search.'}
+                <td
+                  colSpan={5}
+                  className="px-5 py-10 text-center text-sm text-slate-500"
+                >
+                  {books.length === 0
+                    ? "No books found. Add your first book to get started."
+                    : "No books match the current search."}
                 </td>
               </tr>
             )}
@@ -246,18 +307,19 @@ export default function BooksPage() {
         </table>
       </div>
 
+      {/* Add/Edit Book Modal */}
       {isAddModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4">
           <div className="w-full max-w-3xl overflow-hidden rounded-3xl bg-white p-6 shadow-2xl">
             <div className="mb-6 flex items-center justify-between gap-4">
               <div>
                 <h2 className="text-xl font-bold text-slate-900">
-                  {editingBook ? 'Edit book details' : 'Add new book'}
+                  {editingBook ? "Edit book details" : "Add new book"}
                 </h2>
                 <p className="mt-1 text-sm text-slate-500">
                   {editingBook
-                    ? 'Update the selected book record using the backend.'
-                    : 'Fill in book details and save it to the backend.'}
+                    ? "Update the selected book record using the backend."
+                    : "Fill in book details and save it to the backend."}
                 </p>
               </div>
               <button
@@ -270,7 +332,9 @@ export default function BooksPage() {
               </button>
             </div>
             <form
-              onSubmit={handleSubmit(editingBook ? handleEditBook : handleAddBook)}
+              onSubmit={handleSubmit(
+                editingBook ? handleEditBook : handleAddBook,
+              )}
               className="grid gap-4 md:grid-cols-2"
             >
               <Input
@@ -278,8 +342,8 @@ export default function BooksPage() {
                 type="text"
                 placeholder="Enter book title"
                 error={errors.title?.message}
-                {...register('title', {
-                  required: 'Title is required',
+                {...register("title", {
+                  required: "Title is required",
                 })}
               />
               <Input
@@ -287,8 +351,8 @@ export default function BooksPage() {
                 type="text"
                 placeholder="Enter author name"
                 error={errors.author?.message}
-                {...register('author', {
-                  required: 'Author is required',
+                {...register("author", {
+                  required: "Author is required",
                 })}
               />
               <Input
@@ -296,8 +360,8 @@ export default function BooksPage() {
                 type="text"
                 placeholder="123-4567890123"
                 error={errors.isbn?.message}
-                {...register('isbn', {
-                  required: 'ISBN is required',
+                {...register("isbn", {
+                  required: "ISBN is required",
                 })}
               />
               <Input
@@ -305,26 +369,29 @@ export default function BooksPage() {
                 type="number"
                 placeholder="2024"
                 error={errors.publishedYear?.message}
-                {...register('publishedYear', {
-                  required: 'Published year is required',
+                {...register("publishedYear", {
+                  required: "Published year is required",
                   valueAsNumber: true,
                   min: {
                     value: 1000,
-                    message: 'Enter a valid year',
+                    message: "Enter a valid year",
                   },
                   validate: (value) =>
                     (!Number.isNaN(value) && Number.isInteger(value)) ||
-                    'Published year must be a whole number',
+                    "Published year must be a whole number",
                 })}
               />
               <div className="md:col-span-2">
-                <label className="mb-2 block text-sm font-medium text-slate-700" htmlFor="description">
+                <label
+                  className="mb-2 block text-sm font-medium text-slate-700"
+                  htmlFor="description"
+                >
                   Description
                 </label>
                 <textarea
                   id="description"
-                  {...register('description', {
-                    required: 'Description is required',
+                  {...register("description", {
+                    required: "Description is required",
                   })}
                   placeholder="Write a short description of the book"
                   className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500/30"
@@ -337,11 +404,21 @@ export default function BooksPage() {
                 )}
               </div>
               <div className="md:col-span-2 flex flex-wrap items-center justify-end gap-3 pt-2">
-                <Button variant="outline" size="lg" onClick={closeModals} type="button">
+                <Button
+                  variant="outline"
+                  size="lg"
+                  onClick={closeModals}
+                  type="button"
+                >
                   Cancel
                 </Button>
-                <Button variant="primary" size="lg" type="submit" disabled={isSaving}>
-                  {isSaving ? 'Saving…' : 'Save book'}
+                <Button
+                  variant="primary"
+                  size="lg"
+                  type="submit"
+                  disabled={isSaving}
+                >
+                  {isSaving ? "Saving..." : "Save book"}
                 </Button>
               </div>
             </form>
@@ -349,19 +426,26 @@ export default function BooksPage() {
         </div>
       )}
 
+      {/* Delete Confirmation Modal */}
       {deleteBook && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4">
           <div className="w-full max-w-lg overflow-hidden rounded-3xl bg-white p-6 shadow-2xl">
             <h2 className="text-xl font-bold text-slate-900">Delete book</h2>
             <p className="mt-2 text-sm text-slate-500">
-              Confirm deletion of <span className="font-semibold">{deleteBook.title}</span>.
+              Confirm deletion of{" "}
+              <span className="font-semibold">{deleteBook.title}</span>.
             </p>
             <div className="mt-6 flex flex-wrap items-center justify-end gap-3">
               <Button variant="outline" size="lg" onClick={closeModals}>
                 Cancel
               </Button>
-              <Button variant="primary" size="lg" onClick={handleDeleteBook} disabled={isSaving}>
-                {isSaving ? 'Deleting…' : 'Delete book'}
+              <Button
+                variant="primary"
+                size="lg"
+                onClick={handleDeleteBook}
+                disabled={isSaving}
+              >
+                {isSaving ? "Deleting..." : "Delete book"}
               </Button>
             </div>
           </div>

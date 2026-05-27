@@ -6,12 +6,12 @@ import {
   useMemo,
   useState,
   type ReactNode,
-} from 'react';
-import { initializeApiInterceptors } from '../services/api';
-import type { AuthContextValue, User } from '../types/auth.types';
+} from "react";
+import { initializeApiInterceptors } from "../services/api";
+import type { AuthContextValue, User } from "../types/auth.types";
 
-const TOKEN_KEY = 'access_token';
-const USER_KEY = 'user';
+const TOKEN_KEY = "access_token";
+const USER_KEY = "user";
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
@@ -21,6 +21,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    // Restore saved auth state before protected routes decide where to send users.
     const storedToken = localStorage.getItem(TOKEN_KEY);
     const storedUser = localStorage.getItem(USER_KEY);
     if (storedToken) {
@@ -37,6 +38,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const setAuth = useCallback((newToken: string, newUser: User | null) => {
+    // Keep React state and localStorage in sync after login/register.
     setToken(newToken);
     setUser(newUser);
     localStorage.setItem(TOKEN_KEY, newToken);
@@ -48,6 +50,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const logout = useCallback(() => {
+    // Clear both memory and browser storage so the next visit starts unauthenticated.
     setToken(null);
     setUser(null);
     localStorage.removeItem(TOKEN_KEY);
@@ -55,12 +58,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const updateUser = useCallback((updatedUser: User) => {
+    // Persist profile edits immediately so refreshes show the latest account data.
     setUser(updatedUser);
     localStorage.setItem(USER_KEY, JSON.stringify(updatedUser));
   }, []);
 
-  // Initialize API interceptors with logout callback
   useEffect(() => {
+    // Let the shared API client trigger logout when the backend rejects a token.
     initializeApiInterceptors(logout);
   }, [logout]);
 
@@ -83,7 +87,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 export function useAuth(): AuthContextValue {
   const ctx = useContext(AuthContext);
   if (!ctx) {
-    throw new Error('useAuth must be used within AuthProvider');
+    throw new Error("useAuth must be used within AuthProvider");
   }
   return ctx;
 }

@@ -68,16 +68,10 @@ export const features: FeatureItem[] = [
 ];
 
 export const landingStats: StatItem[] = [
-  { label: 'Total Books', value: '...', colorClass: 'bg-stat-blue' },
-  { label: 'Registered Users', value: '...', colorClass: 'bg-stat-indigo' },
-  { label: 'Active Authors', value: '...', colorClass: 'bg-stat-purple' },
-  { label: 'Recent Books', value: '...', colorClass: 'bg-stat-coral' },
-];
-
-export const aboutStats = [
-  { label: 'Libraries served', value: '50+' },
-  { label: 'Daily transactions', value: '2k+' },
-  { label: 'Uptime reliability', value: '99.9%' },
+  { label: 'Total Books', value: '0', colorClass: 'bg-stat-blue' },
+  { label: 'Registered Users', value: '0', colorClass: 'bg-stat-indigo' },
+  { label: 'Active Authors', value: '0', colorClass: 'bg-stat-purple' },
+  { label: 'Recent Books', value: '0', colorClass: 'bg-stat-coral' },
 ];
 
 export const testimonials: TestimonialItem[] = [

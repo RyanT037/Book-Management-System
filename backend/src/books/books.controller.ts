@@ -29,16 +29,18 @@ import { BooksService } from './books.service';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 
-// Defines the shape of the request containing the user payload from the JWT guard
+// Shape added by the JWT strategy after a request is authenticated.
 type AuthRequest = Request & {
   user: { id: number; email: string; role?: Role };
 };
 
+// Controller for managing book resources, requiring JWT authentication for all endpoints.
 @ApiTags('Books')
 @ApiBearerAuth('bearer')
 @ApiUnauthorizedResponse({ description: 'JWT token is missing or invalid.' })
 @Controller('books')
 export class BooksController {
+  // Inject the BooksService to handle business logic.
   constructor(private readonly booksService: BooksService) {}
 
   @UseGuards(AuthGuard('jwt'))
@@ -66,10 +68,11 @@ export class BooksController {
     },
   })
   create(@Body() dto: CreateBookDto, @Req() req: AuthRequest) {
+    // Pass the book data and the authenticated user's ID to the service.
     return this.booksService.create(dto, req.user.id);
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt')) // Protect the endpoint with JWT strategy
   @Get()
   @ApiOperation({
     summary: 'Get all books',
@@ -94,8 +97,8 @@ export class BooksController {
       ],
     },
   })
-  findAll(@Req() req: AuthRequest) {
-    // All users can view all books
+  findAll() {
+    // Any authenticated user can browse the catalog.
     return this.booksService.findAll();
   }
 
@@ -124,7 +127,8 @@ export class BooksController {
     },
   })
   @ApiNotFoundResponse({ description: 'Book was not found.' })
-  findOne(@Param('id', ParseIntPipe) id: number, @Req() req: AuthRequest) {
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    // Fetch a single book by its numeric ID.
     return this.booksService.findOne(id);
   }
 
@@ -162,6 +166,7 @@ export class BooksController {
     @Body() dto: UpdateBookDto,
     @Req() req: AuthRequest,
   ) {
+    // Update logic requires the book ID, the update data, and the user's identity/role.
     return this.booksService.update(
       id,
       dto,
@@ -184,6 +189,7 @@ export class BooksController {
   @ApiNotFoundResponse({ description: 'Book was not found.' })
   @ApiForbiddenResponse({ description: 'Only admins can delete books.' })
   remove(@Param('id', ParseIntPipe) id: number, @Req() req: AuthRequest) {
+    // Deletion is restricted based on the user's role (Admin only).
     return this.booksService.remove(id, req.user.role as Role);
   }
 }

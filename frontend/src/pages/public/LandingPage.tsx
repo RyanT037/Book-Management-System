@@ -6,7 +6,7 @@ import { LandingFooter } from '../../components/landing/LandingFooter';
 import { PublicNavbar } from '../../components/landing/PublicNavbar';
 import { StatsSection } from '../../components/landing/StatsSection';
 import { TestimonialsSection } from '../../components/landing/TestimonialsSection';
-
+// LandingPage serves as the public-facing homepage of the application, showcasing key features, statistics, and testimonials to attract new users.
 export default function LandingPage() {
   return (
     <div className="min-h-svh bg-slate-50">

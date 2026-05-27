@@ -13,10 +13,14 @@ interface DashboardStat {
 }
 
 const placeholderStats: DashboardStat[] = [
-  { label: 'Total Books', value: '...', colorClass: 'bg-stat-purple' },
-  { label: 'Total Users', value: '...', colorClass: 'bg-stat-indigo' },
-  { label: 'Recent Books', value: '...', colorClass: 'bg-stat-blue' },
-  { label: 'Active Authors', value: '...', colorClass: 'bg-stat-coral' },
+  // Initial state for book count
+  { label: 'Total Books', value: '0', colorClass: 'bg-stat-purple' },
+  // Initial state for user count (Admin only)
+  { label: 'Total Users', value: '0', colorClass: 'bg-stat-indigo' },
+  // Initial state for books added recently
+  { label: 'Recent Books', value: '0', colorClass: 'bg-stat-blue' },
+  // Initial state for unique author count
+  { label: 'Active Authors', value: '0', colorClass: 'bg-stat-coral' },
 ];
 
 function formatNumber(value: number) {

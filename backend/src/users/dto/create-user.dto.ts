@@ -14,6 +14,8 @@ export enum Role {
   ADMIN = 'ADMIN',
 }
 
+// Defines the fields required when an admin creates a user account.
+// Admin-created users can include an explicit role assignment.
 export class CreateUserDto {
   @ApiProperty({
     description: 'User email address',
@@ -51,6 +53,7 @@ export class CreateUserDto {
     enum: Role,
     example: Role.USER,
   })
+  // Role is optional so callers can rely on the backend's default user role.
   @IsEnum(Role)
   @IsOptional()
   role?: Role;

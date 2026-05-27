@@ -8,10 +8,12 @@ datasource db {
   provider = "postgresql"
 }
 
+// Represents a system user who can manage books
 model User {
   id        Int      @id @default(autoincrement())
   email     String   @unique
   name      String
+  // Unique handle for the user
   username  String   @unique
   password  String
   role      Role     @default(USER)
@@ -20,11 +22,13 @@ model User {
   books Book[]
 }
 
+// Access control levels
 enum Role {
   USER 
   ADMIN 
 }
 
+// Represents a book entry in the library
 model Book {
   id            Int      @id @default(autoincrement())
   title         String
@@ -35,6 +39,7 @@ model Book {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
+  // Relation to the User who added the book
   userId Int
   user   User @relation(fields: [userId], references: [id])
 }

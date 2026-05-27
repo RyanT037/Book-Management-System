@@ -1,12 +1,13 @@
 import { forwardRef, type InputHTMLAttributes } from 'react';
 import { classNameHelper } from '../../lib/classNameHelper';
 
+// Reusable input component with support for labels, error messages, and hints
 export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
   hint?: string;
 }
-
+// Forwarding ref to allow parent components to access the underlying input element
 export const Input = forwardRef<HTMLInputElement, InputProps>(
   ({ label, error, hint, className, id, ...props }, ref) => {
     const inputId = id ?? props.name;

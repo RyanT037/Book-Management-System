@@ -8,18 +8,20 @@ import { PrismaModule } from './prisma/prisma.module';
 import { BooksModule } from './books/books.module';
 import { StatsModule } from './stats/stats.module';
 
+// The root module of the application that orchestrates all feature modules.
 @Module({
   imports: [
+    // Load environment variables from .env file and make them available globally.
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    AuthModule,
-    UsersModule,
-    PrismaModule,
-    BooksModule,
-    StatsModule,
+    AuthModule,   // Handles authentication and JWT issuance.
+    UsersModule,  // Manages user profiles and administrative tasks.
+    PrismaModule, // Provides the database client (Global).
+    BooksModule,  // Manages the book catalog and ownership.
+    StatsModule,  // Aggregates data for landing pages and dashboards.
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [AppController], // Root-level endpoints (e.g., health checks).
+  providers: [AppService],     // Logic for root-level operations.
 })
-export class AppModule { }
+export class AppModule {}

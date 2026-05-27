@@ -15,9 +15,10 @@ export class AuthService {
   constructor(
     private prisma: PrismaService,
     private jwt: JwtService,
-  ) { }
+  ) {}
 
   async register(dto: RegisterDto) {
+    // Emails are unique login identifiers, so reject duplicates early.
     const exists = await this.prisma.user.findUnique({
       where: { email: dto.email },
     });
@@ -31,7 +32,8 @@ export class AuthService {
         password: await bcrypt.hash(dto.password, 10),
         name: dto.name,
         username: dto.username,
-        role: Role.USER, // enforce normal user role on public registration
+        // Public registration always creates standard users; admins are managed separately.
+        role: Role.USER,
       },
       select: {
         id: true,
@@ -42,11 +44,11 @@ export class AuthService {
       },
     });
 
-
     return { user };
   }
 
   async login(dto: LoginDto) {
+    // Use one generic error so attackers cannot discover which emails exist.
     const user = await this.prisma.user.findUnique({
       where: { email: dto.email },
     });
@@ -68,6 +70,7 @@ export class AuthService {
   }
 
   private signToken(userId: number, email: string, role: Role) {
+    // Passport reads sub, email, and role from this payload on protected routes.
     return this.jwt.signAsync({ sub: userId, email, role });
   }
 }

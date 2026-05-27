@@ -7,9 +7,9 @@ import { statsService } from '../../services/stats.service';
 
 export function HeroSection() {
   const [stats, setStats] = useState([
-    { label: 'Total Users', value: '...', color: 'bg-stat-blue' },
-    { label: 'Total Books', value: '...', color: 'bg-stat-indigo' },
-    { label: 'Total Authors', value: '...', color: 'bg-stat-purple' },
+    { label: 'Total Users', value: '0', color: 'bg-stat-blue' },
+    { label: 'Total Books', value: '0', color: 'bg-stat-indigo' },
+    { label: 'Total Authors', value: '0', color: 'bg-stat-purple' },
     { label: 'Reports', value: 'Live', color: 'bg-stat-coral' },
   ]);
 
@@ -26,13 +26,14 @@ export function HeroSection() {
       })
       .catch(() => {
         setStats([
-          { label: 'Total Users', value: 'N/A', color: 'bg-stat-blue' },
-          { label: 'Total Books', value: 'N/A', color: 'bg-stat-indigo' },
-          { label: 'Total Authors', value: 'N/A', color: 'bg-stat-purple' },
+          { label: 'Total Users', value: '0', color: 'bg-stat-blue' },
+          { label: 'Total Books', value: '0', color: 'bg-stat-indigo' },
+          { label: 'Total Authors', value: '0', color: 'bg-stat-purple' },
           { label: 'Reports', value: 'Live', color: 'bg-stat-coral' },
         ]);
       });
   }, []);
+
   return (
     <section className="relative overflow-hidden bg-gradient-hero pt-12 pb-20 md:pt-20 md:pb-28">
       <div
@@ -47,6 +48,7 @@ export function HeroSection() {
       <Container>
         <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
           <div className="text-center lg:text-left">
+            {/* Badge and Heading */}
             <span className="inline-flex items-center gap-2 rounded-full border border-brand-200 bg-white/80 px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-brand-700 shadow-sm">
               <Sparkles className="h-3.5 w-3.5" />
               Online Library Management
@@ -59,6 +61,8 @@ export function HeroSection() {
               Manage books, users, and library operations efficiently
               with a clean modern platform.
             </p>
+
+            {/* Call to Action Buttons */}
             <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center lg:justify-start">
               <Link to="/register">
                 <Button size="lg" className="group">
@@ -74,11 +78,14 @@ export function HeroSection() {
             </div>
           </div>
 
+          {/* Visual Sidebar/Card Preview */}
           <div className="relative mx-auto w-full max-w-lg lg:max-w-none">
             <div className="relative overflow-hidden rounded-3xl border border-white/60 bg-white/70 p-6 shadow-card backdrop-blur-sm sm:overflow-visible sm:p-8">
+              {/* Floating Icon */}
               <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-brand-600 text-white shadow-lg sm:absolute sm:right-4 sm:top-4 sm:mb-0 sm:h-14 sm:w-14 sm:rounded-2xl md:-right-4 md:-top-4 md:h-16 md:w-16">
                 <Library className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8" strokeWidth={1.5} />
               </div>
+              {/* Stats Grid */}
               <div className="grid grid-cols-2 gap-4 sm:pt-2 md:pt-6">
                 {stats.map((item) => (
                   <div
@@ -90,6 +97,7 @@ export function HeroSection() {
                   </div>
                 ))}
               </div>
+              {/* Feature Highlight */}
               <div className="mt-6 flex items-center gap-3 rounded-2xl bg-slate-50 p-4">
                 <BookMarked className="h-10 w-10 text-brand-600" strokeWidth={1.5} />
                 <div>

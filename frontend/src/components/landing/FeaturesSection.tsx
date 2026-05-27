@@ -15,6 +15,7 @@ export function FeaturesSection() {
         </p>
       </div>
 
+      {/* Feature cards grid - responsive layout from 1 to 3 columns */}
       <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {features.map(({ icon: Icon, title, description }) => (
           <Card key={title} hover className="group border border-slate-100">

@@ -1,6 +1,8 @@
 import { IsInt, IsNotEmpty, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
+// Data Transfer Object for creating a new book.
+// Includes validation rules and Swagger documentation for the book's properties.
 export class CreateBookDto {
   @ApiProperty({ description: 'Book title', example: 'Clean Code' })
   @IsString()

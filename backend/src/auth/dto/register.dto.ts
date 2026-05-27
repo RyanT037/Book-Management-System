@@ -1,6 +1,8 @@
 import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
+// Defines the fields accepted during public user registration.
+// Role is intentionally excluded because the server assigns the default USER role.
 export class RegisterDto {
   @ApiProperty({
     description: 'User email address',
@@ -35,5 +37,5 @@ export class RegisterDto {
   @IsNotEmpty()
   username!: string;
 
-  // Role cannot be set during public registration - it defaults to USER on the server
+  // Role cannot be set during public registration.
 }

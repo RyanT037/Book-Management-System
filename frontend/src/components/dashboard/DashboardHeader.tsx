@@ -11,10 +11,12 @@ export function DashboardHeader({ toggleSidebar }: DashboardHeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { logout } = useAuthActions();
 
+  // Toggle the user dropdown menu visibility
   const toggleUserMenu = () => setIsMenuOpen((prev) => !prev);
 
   return (
     <header className="flex h-16 shrink-0 items-center justify-between border-b border-slate-200 bg-white px-4 sm:px-6">
+      {/* Left side: Mobile menu toggle and system title */}
       <div className="flex items-center gap-3">
         <button
           type="button"

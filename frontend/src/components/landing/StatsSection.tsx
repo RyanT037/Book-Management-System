@@ -4,19 +4,22 @@ import { statsService } from '../../services/stats.service';
 import type { StatItem } from '../../data/landing.data';
 
 const placeholderStats: StatItem[] = [
-  { label: 'Total Books', value: '...', colorClass: 'bg-stat-blue' },
-  { label: 'Registered Users', value: '...', colorClass: 'bg-stat-indigo' },
-  { label: 'Active Authors', value: '...', colorClass: 'bg-stat-purple' },
-  { label: 'Recent Books', value: '...', colorClass: 'bg-stat-coral' },
+  { label: 'Total Books', value: '0', colorClass: 'bg-stat-blue' },
+  { label: 'Registered Users', value: '0', colorClass: 'bg-stat-indigo' },
+  { label: 'Active Authors', value: '0', colorClass: 'bg-stat-purple' },
+  { label: 'Recent Books', value: '0', colorClass: 'bg-stat-coral' },
 ];
 
+/** Formats numeric values with locale-specific separators */
 function formatNumber(value: number) {
   return value.toLocaleString();
 }
 
+// Component to display live statistics about the library system on the landing page
 export function StatsSection() {
   const [stats, setStats] = useState<StatItem[]>(placeholderStats);
 
+  // Fetch real-time statistics from the backend when the component mounts
   useEffect(() => {
     statsService
       .getPublicStats()

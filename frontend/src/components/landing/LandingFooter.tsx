@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Globe, Library, Mail, Share2 } from 'lucide-react';
 import { Container } from '../ui/Container';
 
+// Navigation links for the footer
 const quickLinks = [
   { label: 'Home', to: '/' },
   { label: 'Login', to: '/login' },
@@ -9,6 +10,7 @@ const quickLinks = [
   { label: 'Dashboard', to: '/dashboard' },
 ];
 
+// Social media and contact icons
 const socialIcons = [
   { icon: Share2, label: 'Social' },
   { icon: Globe, label: 'Website' },

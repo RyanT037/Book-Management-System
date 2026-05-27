@@ -8,6 +8,7 @@ import { JwtStrategy } from './jwt.strategy';
 
 @Module({
   imports: [
+    // Configure Passport with JWT as the default strategy
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       imports: [ConfigModule],

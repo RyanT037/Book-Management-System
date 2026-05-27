@@ -12,11 +12,12 @@ interface AuthLayoutProps {
 
 export function AuthLayout({ children, title, subtitle }: AuthLayoutProps) {
   const [stats, setStats] = useState([
-    { label: 'Users', value: '...' },
-    { label: 'Books', value: '...' },
+    { label: 'Users', value: '0' },
+    { label: 'Books', value: '0' },
   ]);
 
   useEffect(() => {
+    // Fetch public statistics for the landing/auth sidebar
     statsService
       .getPublicStats()
       .then((data) => {
@@ -26,9 +27,10 @@ export function AuthLayout({ children, title, subtitle }: AuthLayoutProps) {
         ]);
       })
       .catch(() => {
+        // Fallback values in case of API error
         setStats([
-          { label: 'Users', value: 'N/A' },
-          { label: 'Books', value: 'N/A' },
+          { label: 'Users', value: '0' },
+          { label: 'Books', value: '0' },
         ]);
       });
   }, []);
@@ -36,7 +38,9 @@ export function AuthLayout({ children, title, subtitle }: AuthLayoutProps) {
   return (
     <div className="min-h-svh bg-slate-50">
       <div className="grid min-h-svh lg:grid-cols-2">
+        {/* Left Side: Decorative Sidebar (Hidden on mobile) */}
         <div className="relative hidden overflow-hidden bg-gradient-to-br from-brand-600 via-brand-500 to-indigo-600 lg:flex lg:flex-col lg:justify-between lg:p-12">
+          {/* Decorative background blobs */}
           <div
             aria-hidden
             className="pointer-events-none absolute -right-20 -top-20 h-80 w-80 rounded-full bg-white/10 blur-3xl"
@@ -79,6 +83,7 @@ export function AuthLayout({ children, title, subtitle }: AuthLayoutProps) {
           </p>
         </div>
 
+        {/* Right Side: Auth Forms */}
         <div className="flex flex-col justify-center px-4 py-12 sm:px-8 lg:px-16">
           <Link
             to="/"

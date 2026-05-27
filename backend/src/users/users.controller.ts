@@ -28,22 +28,27 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { Role } from 'src/generated/prisma/browser';
 import type { Request } from 'express';
 
+// Shape added by the JWT strategy after a request is authenticated.
 type AuthRequest = Request & {
   user: { id: number; email: string; role?: Role };
 };
 
 @ApiTags('Users')
 @ApiBearerAuth('bearer')
+// All user management endpoints require a valid JWT token.
 @ApiUnauthorizedResponse({ description: 'JWT token is missing or invalid.' })
 @UseGuards(AuthGuard('jwt'))
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  // User management endpoints are admin-only because they can create accounts
+  // with elevated roles.
   @Post()
   @ApiOperation({
     summary: 'Create a user account as an admin',
-    description: 'Creates a user account. This endpoint is restricted to admins.',
+    description:
+      'Creates a user account. This endpoint is restricted to admins.',
   })
   @ApiBody({ type: CreateUserDto })
   @ApiCreatedResponse({
@@ -58,8 +63,9 @@ export class UsersController {
     },
   })
   @ApiForbiddenResponse({ description: 'Only admins can create users.' })
-  create(@Body() createUserDto: CreateUserDto, @Req() req: AuthRequest) {
-    if (req.user.role !== Role.ADMIN) {
+  create(@Body() createUserDto: CreateUserDto, @Req() request: AuthRequest) {
+    // Keep the role check close to the endpoint so the access rule is explicit.
+    if (request.user.role !== Role.ADMIN) {
       throw new ForbiddenException('Only admins can create users');
     }
     return this.usersService.create(createUserDto);
@@ -68,7 +74,8 @@ export class UsersController {
   @Get()
   @ApiOperation({
     summary: 'Get all users as an admin',
-    description: 'Returns all user accounts. This endpoint is restricted to admins.',
+    description:
+      'Returns all user accounts. This endpoint is restricted to admins.',
   })
   @ApiOkResponse({
     description: 'List of users.',
@@ -85,8 +92,9 @@ export class UsersController {
     },
   })
   @ApiForbiddenResponse({ description: 'Only admins can view all users.' })
-  findAll(@Req() req: AuthRequest) {
-    if (req.user.role !== Role.ADMIN) {
+  findAll(@Req() request: AuthRequest) {
+    // Listing all accounts exposes user data, so it is limited to admins.
+    if (request.user.role !== Role.ADMIN) {
       throw new ForbiddenException('Only admins can view all users');
     }
     return this.usersService.findAll();
@@ -111,6 +119,7 @@ export class UsersController {
     },
   })
   findOne(@Param('id') id: string) {
+    // Fetch a single user by their numeric ID.
     return this.usersService.findOne(+id);
   }
 
@@ -134,13 +143,15 @@ export class UsersController {
     },
   })
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+    // Update user details. Note: In a production app, you'd check if the requester is the user or an admin.
     return this.usersService.update(+id, updateUserDto);
   }
 
   @Delete(':id')
   @ApiOperation({
     summary: 'Delete a user by id as an admin',
-    description: 'Deletes a user account. This endpoint is restricted to admins.',
+    description:
+      'Deletes a user account. This endpoint is restricted to admins.',
   })
   @ApiParam({ name: 'id', type: Number, example: 1 })
   @ApiOkResponse({
@@ -149,6 +160,7 @@ export class UsersController {
   })
   @ApiForbiddenResponse({ description: 'Only admins can delete users.' })
   remove(@Param('id') id: string, @Req() req: AuthRequest) {
+    // Deleting users is destructive and should only be available to admins.
     if (req.user.role !== Role.ADMIN) {
       throw new ForbiddenException('Only admins can delete users');
     }

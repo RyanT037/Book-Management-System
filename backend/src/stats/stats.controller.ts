@@ -1,4 +1,4 @@
-import { Controller, Get, Request, UseGuards } from '@nestjs/common';
+import { Controller, Get, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import {
   ApiBearerAuth,
@@ -9,11 +9,14 @@ import {
 } from '@nestjs/swagger';
 import { StatsService } from './stats.service';
 
+// Controller for retrieving application-wide statistics.
+// Provides both public data for the landing page and protected data for the dashboard.
 @ApiTags('Statistics')
 @Controller('stats')
 export class StatsController {
   constructor(private readonly statsService: StatsService) {}
 
+  // Public endpoint to show platform growth and activity to visitors.
   @Get('public')
   @ApiOperation({
     summary: 'Get public landing page statistics',
@@ -35,6 +38,7 @@ export class StatsController {
     return this.statsService.getPublicStats();
   }
 
+  // Protected endpoint for the user dashboard.
   @UseGuards(AuthGuard('jwt'))
   @Get('dashboard')
   @ApiBearerAuth('bearer')
@@ -55,7 +59,8 @@ export class StatsController {
     },
   })
   @ApiUnauthorizedResponse({ description: 'JWT token is missing or invalid.' })
-  getDashboardStats(@Request() req: { user: { id: number } }) {
-    return this.statsService.getDashboardStats(req.user.id);
+  getDashboardStats() {
+    // Dashboard stats are currently global totals for every authenticated user.
+    return this.statsService.getDashboardStats();
   }
 }
