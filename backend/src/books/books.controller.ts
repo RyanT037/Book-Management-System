@@ -67,9 +67,9 @@ export class BooksController {
       },
     },
   })
-  create(@Body() dto: CreateBookDto, @Req() req: AuthRequest) {
+  create(@Body() dto: CreateBookDto, @Req() request: AuthRequest) {
     // Pass the book data and the authenticated user's ID to the service.
-    return this.booksService.create(dto, req.user.id);
+    return this.booksService.create(dto, request.user.id);
   }
 
   @UseGuards(AuthGuard('jwt')) // Protect the endpoint with JWT strategy
@@ -164,14 +164,14 @@ export class BooksController {
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateBookDto,
-    @Req() req: AuthRequest,
+    @Req() request: AuthRequest,
   ) {
     // Update logic requires the book ID, the update data, and the user's identity/role.
     return this.booksService.update(
       id,
       dto,
-      req.user.id,
-      req.user.role as Role,
+      request.user.id,
+      request.user.role as Role,
     );
   }
 
@@ -188,8 +188,8 @@ export class BooksController {
   })
   @ApiNotFoundResponse({ description: 'Book was not found.' })
   @ApiForbiddenResponse({ description: 'Only admins can delete books.' })
-  remove(@Param('id', ParseIntPipe) id: number, @Req() req: AuthRequest) {
+  remove(@Param('id', ParseIntPipe) id: number, @Req() request: AuthRequest) {
     // Deletion is restricted based on the user's role (Admin only).
-    return this.booksService.remove(id, req.user.role as Role);
+    return this.booksService.remove(id, request.user.role as Role);
   }
 }

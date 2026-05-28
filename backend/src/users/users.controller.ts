@@ -143,7 +143,7 @@ export class UsersController {
     },
   })
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    // Update user details. Note: In a production app, you'd check if the requester is the user or an admin.
+    // Update user details. 
     return this.usersService.update(+id, updateUserDto);
   }
 
@@ -159,9 +159,9 @@ export class UsersController {
     schema: { example: { id: 1 } },
   })
   @ApiForbiddenResponse({ description: 'Only admins can delete users.' })
-  remove(@Param('id') id: string, @Req() req: AuthRequest) {
+  remove(@Param('id') id: string, @Req() request: AuthRequest) {
     // Deleting users is destructive and should only be available to admins.
-    if (req.user.role !== Role.ADMIN) {
+    if (request.user.role !== Role.ADMIN) {
       throw new ForbiddenException('Only admins can delete users');
     }
     return this.usersService.remove(+id);

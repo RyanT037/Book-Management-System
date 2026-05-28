@@ -35,6 +35,7 @@ export class AuthService {
         // Public registration always creates standard users; admins are managed separately.
         role: Role.USER,
       },
+      
       select: {
         id: true,
         email: true,
