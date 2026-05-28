@@ -88,7 +88,10 @@ PORT=3000
 Run Prisma migrations and generate the Prisma client:
 
 ```bash
+npx prisma generate
 npx prisma migrate dev
+npx prisma db seed // seeds default admins into the database set credentials of your choice in .env
+
 ```
 
 Start the backend in development mode:
