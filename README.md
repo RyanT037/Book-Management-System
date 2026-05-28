@@ -83,6 +83,10 @@ Create a `.env` file in `backend/`:
 DATABASE_URL="postgresql://postgres:<password>@localhost:5432/book_management?schema=public"
 JWT_SECRET="replace-with-a-strong-secret"
 PORT=3000
+ADMIN_ONE_EMAIL=email
+ADMIN_ONE_PASSWORD=password
+ADMIN_TWO_EMAIL=email
+ADMIN_TWO_PASSWORD=password
 ```
 
 Run Prisma migrations and generate the Prisma client:
